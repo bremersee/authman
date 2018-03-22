@@ -1,0 +1,3 @@
+@echo off
+echo Starting backend client ...
+java -cp bec.jar;./lib/*.jar org.springframework.boot.loader.JarLauncher %1 %2 %3 %4 %5 %6 %7 %8 %9

@@ -1,0 +1,196 @@
+bremersee:
+  authorization-server:
+    allow-form-authentication-for-clients: false
+    check-token-access: isAuthenticated()
+    handle-approval-revocations-as-expiry: false
+    jwt-key-pair-alias: jwt
+    jwt-key-pair-password: changeit
+    jwt-key-store-location: classpath:jwt.jks
+    jwt-key-store-password: changeit
+    no-scope-description-available: Sorry, there's no description of this scope.
+    realm: oauth2/client
+    ssl-only: false
+    token-key-access: permitAll()
+  oauth2:
+    facebook:
+      provider: facebook
+      login-url-template: "\
+        https://www.facebook.com/v2.8/dialog/oauth\
+        ?client_id={clientId}\
+        &redirect_uri={redirectUri}\
+        &response_type={responseType}\
+        &scope={scope}\
+        &state={state}"
+      client-id: 1253027028056781
+      client-secret: d21cba2b31747b2e1bb4e5aa550d9ae6
+      redirect-uri: http://localhost:8080/authman/facebook/callback
+      response-type: code
+      scope: public_profile,email
+      token-url-template: "\
+        https://graph.facebook.com/v2.8/oauth/access_token\
+        ?client_id={clientId}\
+        &redirect_uri={redirectUri}\
+        &client_secret={clientSecret}\
+        &code={code}"
+      api-base-url: https://graph.facebook.com/v2.8
+      profile-path-template: "/me?access_token={accessToken}\
+        &fields=id,name,gender,first_name,middle_name,last_name,name_format,email,locale,timezone,verified,website"
+    github:
+      provider: github
+      login-url-template: "\
+        https://github.com/login/oauth/authorize\
+        ?client_id={clientId}\
+        &redirect_uri={redirectUri}\
+        &scope={scope}\
+        &state={state}"
+      client-id: 31c978b47ec18489150c
+      client-secret: 2ca68e31f14c754f68198a481983042b670b4732
+      redirect-uri: http://localhost:8080/authman/github/callback
+      response-type: code
+      scope: user
+      token-url-template: "\
+        https://github.com/login/oauth/access_token\
+        ?client_id={clientId}\
+        &client_secret={clientSecret}\
+        &redirect_uri={redirectUri}\
+        &code={code}"
+      token-method: POST
+      api-base-url: https://api.github.com
+      profile-path-template: /user?access_token={accessToken}
+    google:
+      provider: google
+      login-url-template: "\
+        https://accounts.google.com/o/oauth2/v2/auth\
+        ?client_id={clientId}\
+        &redirect_uri={redirectUri}\
+        &response_type={responseType}\
+        &scope={scope}\
+        &state={state}\
+        &access_type={accessType}\
+        &include_granted_scopes={includeGrantedScopes}"
+      client-id: 316779660375-thnvtiq4vqjm2o5rcluq923hf20j2q79.apps.googleusercontent.com
+      client-secret: CtGU8UpQrwENWfE_EVrv_to0
+      redirect-uri: http://localhost:8080/authman/google/callback
+      response-type: code
+      scope: profile email
+      additional-login-parameters:
+#          accessType:  offline
+        includeGrantedScopes: false
+        accessType:  online
+      token-url-template: "\
+        https://www.googleapis.com/oauth2/v4/token\
+        ?client_id={clientId}\
+        &client_secret={clientSecret}\
+        &redirect_uri={redirectUri}\
+        &code={code}\
+        &grant_type=authorization_code"
+      token-method: POST
+      api-base-url: https://www.googleapis.com
+      profile-path-template: /plus/v1/people/me?access_token={accessToken}
+  registration:
+    life-time: 30
+    life-time-unit: days
+    link: http://localhost:8080/authman/register?hash={registrationHash}
+    sender: no-reply@bremersee.org
+    subject-code: userRegistrationService.sendValidationEmail.subject
+  samba-connector:
+    name: smb-con
+#    name: false
+    url: http://localhost:8090
+    token-endpoint: http://localhost:8080/authman/oauth/token
+  security:
+    crypto:
+      password-encoder:
+        algorithm: SSHA256
+        random-salt-length: 4
+        store-no-encryption-flag: false
+  sms:
+    enabled: true
+    url: https://gate1.goyyamobile.com/sms/sendsms.asp
+    username: 1108901
+    password: zgh325gtp
+    sender: bremersee
+  startup:
+    admin:
+      user-name: admin
+      password: secret4ADMIN
+      display-name: Adam Admin
+      email: admin@bremersee.org
+      preferred-locale: de_DE
+      preferred-time-zone-id: Europe/Berlin
+  user-service:
+    min-search-length: 3
+
+feign:
+  client:
+    config:
+      default:
+        logger-level: FULL
+        connect-timeout: 5000
+        read-timeout: 5000
+      smb-con:
+        logger-level: FULL
+        connect-timeout: 5000
+        read-timeout: 5000
+
+
+logging:
+  level:
+    ROOT: info
+    org.bremersee: debug
+    org.springframework.security.oauth2: debug
+
+server:
+  port: 8080
+  servlet:
+    context-path: /authman
+
+spring:
+  data:
+    mongodb:
+      database: auth
+      host: localhost
+  jackson:
+    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
+    default-property-inclusion: non_null
+    property-naming-strategy: LOWER_CAMEL_CASE
+    locale: de_DE
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+    time-zone: Europe/Berlin
+  mail:
+    host: mail.bremersee.org
+    port: 465
+    username: no-reply@bremersee.org
+    password: 8fbpwkjA
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.ssl.enable: true
+  messages:
+    basename: messages
+  thymeleaf:
+    cache: false
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          bremersee:
+#            client-id: internal
+#            client-secret: secret4INTERNAL
+#            client-name: Client for user scope
+#            provider: bremersee
+#            scope:
+#              - profile
+#              - profile:write
+#            redirect-uri-template: http://localhost:7080
+#            client-authentication-method: basic
+#            authorization-grant-type: authorization_code
+#        provider:
+#          bremersee:
+#            authorization-uri: http://localhost:7080/oauth/authorize
+#            token-uri: http://localhost:7080/oauth/token
+#            user-info-uri: http://localhost:7080/api/me
+#            jwk-set-uri: http://localhost:7080/token_keys
+#            user-name-attribute: name
+
+# curl -v --data "grant_type=refresh_token&client_id=THE_CLIENT_ID&refresh_token=THE_REFRESH_TOKEN" http://localhost:8080/oauth/token

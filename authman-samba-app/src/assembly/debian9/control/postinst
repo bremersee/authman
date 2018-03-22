@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+/usr/bin/getent passwd bec
+if [ ! $? -eq 0 ]; then
+  /usr/sbin/adduser --system --home /var/lib/bec --shell /bin/false --no-create-home --group --disabled-login bec
+fi
+
+/bin/chown -R bec:bec /var/lib/bec
+/bin/chmod -R u+rwx /var/lib/bec
+
+/bin/mkdir -p /var/log/bec
+/bin/chown -R bec:bec /var/log/bec
+/bin/chmod u+rwx /var/log/bec
+
+if [ ! -e /etc/systemd/system/bec.service ]; then
+  ln -s /lib/systemd/system/bec.service /etc/systemd/system/bec.service
+fi
+/bin/systemctl enable bec.service
+/bin/systemctl start bec.service
+
+exit 0

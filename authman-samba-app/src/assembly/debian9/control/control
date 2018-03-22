@@ -1,0 +1,8 @@
+Package: bec
+Version: [[version]]
+Section: net
+Priority: optional
+Architecture: all
+Description: [[description]]
+Maintainer: christian.bremer@cstx.de
+Depends: default-jre | java7-runtime | java8-runtime

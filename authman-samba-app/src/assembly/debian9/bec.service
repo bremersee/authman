@@ -1,0 +1,11 @@
+[Unit]
+Description=Back2Car Backend Client
+After=syslog.target
+
+[Service]
+User=bec
+ExecStart=/usr/bin/bec.sh
+SuccessExitStatus=1 4 3
+
+[Install]
+WantedBy=multi-user.target

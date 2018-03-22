@@ -1,0 +1,39 @@
+{
+  "kind": "plus#person",
+  "etag": "\"_a_etag\"",
+  "gender": "female",
+  "emails": [
+    {
+      "value": "anna@example.org",
+      "type": "account"
+    }
+  ],
+  "objectType": "person",
+  "id": "123456789012345678901",
+  "displayName": "Anna Livia Plurabelle",
+  "name": {
+    "familyName": "Plurabelle",
+    "givenName": "Anna Livia"
+  },
+  "url": "https://plus.google.com/123456789012345678901",
+  "image": {
+    "url": "https://lh3.googleusercontent.com/a/b/c/abc/photo.jpg?sz=50",
+    "isDefault": true
+  },
+  "isPlusUser": true,
+  "language": "de",
+  "circledByCount": 2,
+  "verified": false,
+  "cover": {
+    "layout": "banner",
+    "coverPhoto": {
+      "url": "https://lh3.googleusercontent.com/xyz",
+      "height": 528,
+      "width": 940
+    },
+    "coverInfo": {
+      "topImageOffset": 0,
+      "leftImageOffset": 0
+    }
+  }
+}

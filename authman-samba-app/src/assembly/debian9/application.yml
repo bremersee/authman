@@ -1,0 +1,38 @@
+bec:
+  home: /var/lib/bec/data
+  plugin:
+    definition-location: file:/var/lib/bec/plugins.xml
+  security:
+    ssl-context:
+#      ca-crt-location: ./ca.crt
+#      client-crt-location: ./client.crt
+#      client-key-location: ./client.key
+#      client-key-password: changeit
+      enable-client-certificate-authentication: false
+      subject-dn-regex: CN\=(.*?),
+      enable-trust-all-server-certificates: false
+#      enable-sni-extension: false
+#      key-alias: client
+#      key-store-location: ./keystore.jks
+#      key-store-password: changeit
+#      key-store-type: JKS
+#      trust-store-location: ./truststore.jks
+#      trust-store-password: changeit
+#      trust-store-type: JKS
+  http:
+    root-uri: http://localhost:8080/gateway/bec
+    get-path-template: /bmsg?b2cClientId={b2cClientId}&max={max}
+    post-path-template: /bmsg?b2cClientId={b2cClientId}
+    serialization-type: best_readable
+#    serialization-type: json
+#    serialization-type: xml
+
+logging:
+  level:
+    ROOT: info
+    de.vwag.back2car: info
+    org.springframework: info
+  path: /var/log/bec
+  file:
+    max-history: 100
+    max-size: 10MB

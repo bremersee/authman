@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ -e /etc/systemd/system/bec.service ]; then
+    /bin/systemctl stop bec.service
+    /bin/systemctl disable bec.service
+fi
+
+exit 0

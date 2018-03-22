@@ -1,0 +1,49 @@
+bremersee:
+  ldaptive:
+#    trust-certificates: classpath:/letsencrypt-intermediate.pem
+#    ldap-url: ldap://dc.ad.bremersee.org:389
+#    use-start-tls: true
+    ldap-url: ldaps://dc.ad.bremersee.org:636
+    use-ssl: true
+    bind-dn: Administrator@ad.bremersee.org
+    bind-credential: SBivVdSsmg,d3nmh
+    pooled: true
+    min-pool-size: 3
+    max-pool-size: 10
+    validate-on-check-in: false
+    validate-on-check-out: false
+    validate-periodically: true
+    validate-period: 300
+    idle-time: 600
+    block-wait-time: 10000
+    search-validator:
+      search-request:
+        base-dn: dc=ad,dc=bremersee,dc=org
+        search-filter:
+          filter: (cn=Administrator)
+        size-limit: 1
+        search-scope: ONELEVEL
+        return-attributes:
+          - cn
+  samba-domain:
+    group-base-dn: cn=Users,dc=ad,dc=bremersee,dc=org
+    user-base-dn: cn=Users,dc=ad,dc=bremersee,dc=org
+
+logging:
+  level:
+    ROOT: info
+    org.bremersee: debug
+    org.springframework.security.oauth2: debug
+
+server:
+  port: 8090
+
+spring:
+  jackson:
+    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
+    default-property-inclusion: non_null
+    property-naming-strategy: LOWER_CAMEL_CASE
+    locale: de_DE
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+    time-zone: Europe/Berlin

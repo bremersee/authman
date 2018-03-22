@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: authman
+#  cloud:
+#    config:
+#      uri: https://bremersee.org/config
+#      username: cloudcomponent
+#      password: changeit

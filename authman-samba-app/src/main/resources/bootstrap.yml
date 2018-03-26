@@ -1,8 +1,9 @@
 spring:
   application:
     name: smb-con
-#  cloud:
-#    config:
-#      uri: https://bremersee.org/config
-#      username: cloudcomponent
-#      password: Wenn1chEin3nPasswortgeneratorHaetteStaendeHi3rEinGanzKompliziertesPasswort
+  cloud:
+    config:
+      enabled: ${CONFIG_CLIENT_ENABLED:false}
+      uri: ${CONFIG_URI:https://github.com/bremersee/config}
+      username: ${CONFIG_USER:user}
+      password: ${CONFIG_PASSWORD:changeit}

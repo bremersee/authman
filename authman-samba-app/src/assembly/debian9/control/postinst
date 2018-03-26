@@ -17,6 +17,6 @@ if [ ! -e /etc/systemd/system/smb-con.service ]; then
   ln -s /lib/systemd/system/smb-con.service /etc/systemd/system/smb-con.service
 fi
 /bin/systemctl enable smb-con.service
-/bin/systemctl start smb-con.service
+# /bin/systemctl start smb-con.service
 
 exit 0

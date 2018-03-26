@@ -189,6 +189,33 @@
   </build>
 
   <profiles>
+    <!-- see: https://www.triology.de/blog/versionsnamen-mit-maven-erzeugen-des-versionsnamens -->
+    <!--
+    <profile>
+      <id>versionNameBuildNumber</id>
+      <activation>
+        <property>
+          <name>env.BUILD_NUMBER</name>
+        </property>
+      </activation>
+      <properties>
+        <versionName>
+          ${project.version}-${env.BUILD_NUMBER}-${scmBranch}-${buildNumber}
+        </versionName>
+      </properties>
+    </profile>
+    <profile>
+      <id>versionNameForRelease</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+        </property>
+      </activation>
+      <properties>
+        <versionName>${project.version}</versionName>
+      </properties>
+    </profile>
+    -->
     <profile>
       <id>debian9</id>
       <activation>
@@ -237,11 +264,13 @@
                 </goals>
                 <configuration>
                   <verbose>true</verbose>
+                  <!--suppress MavenModelInspection -->
                   <deb>
-                    ${project.basedir}/target/smb-con_${project.version}-${buildNumber}_all.deb
+                    ${project.basedir}/target/smb-con_${project.version}-${maven.build.timestamp}+${scmBranch}+${buildNumber}_all.deb
                   </deb>
+                  <!--suppress MavenModelInspection -->
                   <changesOut>
-                    ${project.basedir}/target/smb-con_${project.version}-${buildNumber}_all.changes
+                    ${project.basedir}/target/smb-con_${project.version}-${maven.build.timestamp}+${scmBranch}+${buildNumber}_all.changes
                   </changesOut>
                   <controlDir>${basedir}/src/assembly/debian9/control</controlDir>
                   <dataSet>

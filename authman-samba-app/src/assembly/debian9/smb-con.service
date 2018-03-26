@@ -4,7 +4,7 @@ After=syslog.target
 
 [Service]
 User=smb-con
-ExecStart=/opt/smb-con/smb-conf.jar
+ExecStart=/var/lib/smb-con/smb-con.jar
 SuccessExitStatus=1 4 3
 
 [Install]

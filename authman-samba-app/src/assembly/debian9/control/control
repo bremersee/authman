@@ -1,8 +1,8 @@
-Package: bec
+Package: smb-con
 Version: [[version]]
 Section: net
 Priority: optional
 Architecture: all
 Description: [[description]]
-Maintainer: christian.bremer@cstx.de
-Depends: default-jre | java7-runtime | java8-runtime
+Maintainer: bremersee@googlemail.com
+Depends: default-jre | java8-runtime

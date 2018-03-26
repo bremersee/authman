@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ -e /etc/systemd/system/bec.service ]; then
-    /bin/systemctl stop bec.service
-    /bin/systemctl disable bec.service
+if [ -e /etc/systemd/system/smb-con.service ]; then
+    /bin/systemctl stop smb-con.service
+    /bin/systemctl disable smb-con.service
 fi
 
 exit 0

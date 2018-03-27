@@ -12,7 +12,7 @@
             <source>src/assembly/debian9/smb-con.conf</source>
             <outputDirectory>var/lib/smb-con</outputDirectory>
             <filtered>false</filtered>
-            <fileMode>644</fileMode>
+            <fileMode>600</fileMode>
         </file>
         <file>
             <source>src/assembly/debian9/smb-con.service</source>

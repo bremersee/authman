@@ -16,7 +16,13 @@ fi
 if [ ! -e /etc/systemd/system/smb-con.service ]; then
   ln -s /lib/systemd/system/smb-con.service /etc/systemd/system/smb-con.service
 fi
+
 /bin/systemctl enable smb-con.service
-# /bin/systemctl start smb-con.service
+if [ -e /var/lib/smb-con/smb-con.conf.user ]; then
+    cp /var/lib/smb-con/smb-con.conf /var/lib/smb-con/smb-con.conf.package
+    cp /var/lib/smb-con/smb-con.conf.user /var/lib/smb-con/smb-con.conf
+    rm -f /var/lib/smb-con/smb-con.conf.user
+    /bin/systemctl start smb-con.service
+fi
 
 exit 0

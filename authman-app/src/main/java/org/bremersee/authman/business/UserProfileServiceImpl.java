@@ -17,7 +17,6 @@
 package org.bremersee.authman.business;
 
 import java.util.Collections;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -159,7 +158,8 @@ public class UserProfileServiceImpl extends AbstractUserProfileService
     return getUserRepository()
         .findByUserName(userName)
         .map(userProfile -> {
-          if (sambaConnectorService.userExists(userProfile.getUserName())) {
+          if (SecurityHelper.isCurrentUserAdmin()
+              && sambaConnectorService.userExists(userProfile.getUserName())) {
             final SambaUser sambaUser = sambaConnectorService.getUser(userProfile.getUserName());
             SambaSettingsDto sambaSettings = new SambaSettingsDto();
             if (sambaUser.getGroups() != null) {

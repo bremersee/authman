@@ -3,12 +3,12 @@ bremersee:
     allow-form-authentication-for-clients: false
     check-token-access: isAuthenticated()
     handle-approval-revocations-as-expiry: false
-    jwt-key-pair-alias: jwt
-    jwt-key-pair-password: changeit
-    jwt-key-store-location: classpath:jwt.jks
-    jwt-key-store-password: changeit
+    jwt-key-pair-alias: ${JWT_KEY_PAIR_ALIAS:jwt}
+    jwt-key-pair-password: ${JWT_KEY_PAIR_PASSWORD:changeit}
+    jwt-key-store-location: ${JWT_KEY_STORE_LOCATION:classpath:jwt.jks}
+    jwt-key-store-password: ${JWT_KEY_STORE_PASSWORD:changeit}
     no-scope-description-available: Sorry, there's no description of this scope.
-    realm: oauth2/client
+    realm: ${REALM:oauth2/client}
     ssl-only: false
     token-key-access: permitAll()
   oauth2:
@@ -21,9 +21,9 @@ bremersee:
         &response_type={responseType}\
         &scope={scope}\
         &state={state}"
-      client-id: 1253027028056781
-      client-secret: d21cba2b31747b2e1bb4e5aa550d9ae6
-      redirect-uri: http://localhost:8080/authman/facebook/callback
+      client-id: ${FACEBOOK_CLIENT_ID:changeit}
+      client-secret: ${FACEBOOK_CLIENT_SECRET:changeit}
+      redirect-uri: http://localhost:${server.port}${server.servlet.context-path}/facebook/callback
       response-type: code
       scope: public_profile,email
       token-url-template: "\
@@ -43,9 +43,9 @@ bremersee:
         &redirect_uri={redirectUri}\
         &scope={scope}\
         &state={state}"
-      client-id: 31c978b47ec18489150c
-      client-secret: 2ca68e31f14c754f68198a481983042b670b4732
-      redirect-uri: http://localhost:8080/authman/github/callback
+      client-id: ${GITHUB_CLIENT_ID:changeit}
+      client-secret: ${GITHUB_CLIENT_SECRET:changeit}
+      redirect-uri: http://localhost:${server.port}${server.servlet.context-path}/github/callback
       response-type: code
       scope: user
       token-url-template: "\
@@ -68,9 +68,9 @@ bremersee:
         &state={state}\
         &access_type={accessType}\
         &include_granted_scopes={includeGrantedScopes}"
-      client-id: 316779660375-thnvtiq4vqjm2o5rcluq923hf20j2q79.apps.googleusercontent.com
-      client-secret: CtGU8UpQrwENWfE_EVrv_to0
-      redirect-uri: http://localhost:8080/authman/google/callback
+      client-id: ${GOOGLE_CLIENT_ID:changeit}
+      client-secret: ${GOOGLE_CLIENT_SECRET:changeit}
+      redirect-uri: http://localhost:${server.port}${server.servlet.context-path}/google/callback
       response-type: code
       scope: profile email
       additional-login-parameters:
@@ -90,14 +90,14 @@ bremersee:
   registration:
     life-time: 30
     life-time-unit: days
-    link: http://localhost:8080/authman/register?hash={registrationHash}
+    link: http://localhost:${server.port}${server.servlet.context-path}/register?hash={registrationHash}
     sender: no-reply@bremersee.org
     subject-code: userRegistrationService.sendValidationEmail.subject
   samba-connector:
     name: smb-con
 #    name: false
     url: http://localhost:8090
-    token-endpoint: http://localhost:8080/authman/oauth/token
+    token-endpoint: http://localhost:${server.port}${server.servlet.context-path}/oauth/token
   security:
     crypto:
       password-encoder:
@@ -105,21 +105,21 @@ bremersee:
         random-salt-length: 4
         store-no-encryption-flag: false
   sms:
-    enabled: true
+    enabled: false
     url: https://gate1.goyyamobile.com/sms/sendsms.asp
-    username: 1108901
-    password: zgh325gtp
-    sender: bremersee
+    username: ${SMS_USERNAME:changeit}
+    password: ${SMS_PASSWORD:changeit}
+    sender: ${SMS_SENDER:bremersee}
   startup:
     admin:
-      user-name: admin
-      password: secret4ADMIN
-      display-name: Adam Admin
-      email: admin@bremersee.org
-      preferred-locale: de_DE
-      preferred-time-zone-id: Europe/Berlin
+      user-name: ${ADMIN_USERNAME:admin}
+      password: ${ADMIN_PASSWORD:secret4ADMIN}
+      display-name: ${ADMIN_DISPLAY_NAME:Adam Admin}
+      email: ${ADMIN_EMAIL:admin@bremersee.org}
+      preferred-locale: ${ADMIN_LOCALE:de_DE}
+      preferred-time-zone-id: ${ADMIN_TIME_ZONE:Europe/Berlin}
   user-service:
-    min-search-length: 3
+    min-search-length: ${USER_MIN_SEARCH_LENGTH:3}
 
 feign:
   client:
@@ -138,12 +138,12 @@ logging:
   level:
     ROOT: info
     org.bremersee: debug
-    org.springframework.security.oauth2: debug
+    org.springframework: info
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
   servlet:
-    context-path: /authman
+    context-path: ${SERVER_CONTEXT_PATH:/authman}
 
 spring:
   data:
@@ -159,13 +159,13 @@ spring:
       WRITE_DATES_AS_TIMESTAMPS: false
     time-zone: Europe/Berlin
   mail:
-    host: mail.bremersee.org
-    port: 465
-    username: no-reply@bremersee.org
-    password: 8fbpwkjA
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:25}
+    username: ${MAIL_USERNAME:no-reply@bremersee.org}
+    password: ${MAIL_PASSWORD:changeit}
     properties:
-      mail.smtp.auth: true
-      mail.smtp.ssl.enable: true
+      mail.smtp.auth: ${MAIL_SMTP_AUTH:false}
+      mail.smtp.ssl.enable: ${MAIL_SMTP_SSL_ENABLE:false}
   messages:
     basename: messages
   thymeleaf:

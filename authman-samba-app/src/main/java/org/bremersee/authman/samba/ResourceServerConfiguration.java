@@ -34,6 +34,7 @@ import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 @EnableResourceServer
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
+  /*
   @Bean
   @Primary
   public RemoteTokenServices tokenService() {
@@ -51,6 +52,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     // nothing to configure
     resources.tokenServices(tokenService());
   }
+  */
 
   @Override
   public void configure(HttpSecurity http) throws Exception {

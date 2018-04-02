@@ -16,6 +16,7 @@
 
 package org.bremersee.authman.samba;
 
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -36,6 +37,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
   @Bean
   @Primary
   public RemoteTokenServices tokenService() {
+
     RemoteTokenServices tokenService = new RemoteTokenServices();
     //tokenService.set
     tokenService.setCheckTokenEndpointUrl("http://localhost:8080/authman/oauth/check_token");

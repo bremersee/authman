@@ -74,9 +74,9 @@ bremersee:
       response-type: code
       scope: profile email
       additional-login-parameters:
-#          accessType:  offline
         includeGrantedScopes: false
-        accessType:  online
+        accessType: online
+#        accessType: offline
       token-url-template: "\
         https://www.googleapis.com/oauth2/v4/token\
         ?client_id={clientId}\
@@ -133,12 +133,16 @@ feign:
         connect-timeout: 5000
         read-timeout: 5000
 
-
 logging:
   level:
     ROOT: info
     org.bremersee: debug
     org.springframework: info
+
+management:
+  server:
+    servlet:
+      context-path: /management
 
 server:
   port: ${SERVER_PORT:8080}
@@ -170,6 +174,10 @@ spring:
     basename: messages
   thymeleaf:
     cache: false
+  zipkin:
+    enabled: false
+    base-url: http://zipkin:9411/
+
 #  security:
 #    oauth2:
 #      client:

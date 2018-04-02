@@ -50,6 +50,33 @@ spring:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
     time-zone: Europe/Berlin
+  zipkin:
+    enabled: false
+    base-url: http://localhost:9411/
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: true
+    prefer-same-zone-eureka: true
+    service-url:
+      defaultZone: http://192.168.1.16:8761/eureka/
+
+management:
+  server:
+    servlet:
+      context-path: /management
+
+security:
+  oauth2:
+    client:
+      client-id: internal
+      client-secret: secret4INTERNAL
+    resource:
+      jwt:
+        key-uri: http://localhost:8080/authman/oauth/token_key
+      token-info-uri: http://localhost:8080/authman/oauth/check_token
+      prefer-token-info: true
 
 ---
 

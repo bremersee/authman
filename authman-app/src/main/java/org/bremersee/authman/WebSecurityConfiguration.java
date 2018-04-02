@@ -29,6 +29,8 @@ import org.bremersee.authman.security.authentication.github.GitHubAuthentication
 import org.bremersee.authman.security.authentication.github.GitHubUserProfileParser;
 import org.bremersee.authman.security.authentication.google.GoogleAuthenticationProperties;
 import org.bremersee.authman.security.authentication.google.GoogleUserProfileParser;
+import org.bremersee.authman.security.core.RoleConstants;
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -191,6 +193,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .formLogin().loginPage(LOGIN_PAGE).permitAll()
         .and()
         .logout().logoutSuccessUrl("/logged-out")
+        .and()
+        .requestMatcher(EndpointRequest.toAnyEndpoint()).authorizeRequests()
+        .anyRequest().hasAuthority(RoleConstants.ADMIN_ROLE)
         .and()
         .requestMatcher(new NegatedRequestMatcher(new AntPathRequestMatcher("/api/**")))
         .authorizeRequests()

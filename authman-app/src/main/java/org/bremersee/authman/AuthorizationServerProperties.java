@@ -79,13 +79,17 @@ public class AuthorizationServerProperties {
     return authorizationGrantTypes;
   }
 
-  private String jwtKeyStoreLocation = "classpath:/jwt.jks";
+  private String jwtSigningKey;
 
-  private String jwtKeyStorePassword = "changeit"; // NOSONAR
+  private String jwtVerifierKey;
 
-  private String jwtKeyPairAlias = "jwt";
+  private String jwtKeyStoreLocation;
 
-  private String jwtKeyPairPassword = null;
+  private String jwtKeyStorePassword;
+
+  private String jwtKeyPairAlias;
+
+  private String jwtKeyPairPassword;
 
   private String realm = "oauth2/client";
 
@@ -162,7 +166,7 @@ public class AuthorizationServerProperties {
     sambaConnectorClient.getAutoApproveScopes().add(Boolean.TRUE.toString());
 
     internalClient.setDisplayName("Internal OAuth2 Client");
-    internalClient.setClientId("internal");
+    internalClient.setClientId("internal-client");
     internalClient.setClientSecret("secret4INTERNAL");
     internalClient.setClientSecretEncrypted(false);
     internalClient.getAuthorizedGrantTypes().add(AUTHORIZATION_CODE); // -> response_type=code

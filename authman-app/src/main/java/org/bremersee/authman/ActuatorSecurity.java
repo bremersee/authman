@@ -16,26 +16,29 @@
 
 package org.bremersee.authman;
 
+import org.bremersee.authman.security.core.RoleConstants;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
  * @author Christian Bremer
  */
-@Configuration
+//@Configuration
+//@Order(99)
 public class ActuatorSecurity extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http.requestMatcher(EndpointRequest.toAnyEndpoint()).authorizeRequests()
-        .anyRequest().permitAll();
-    /*
-        .anyRequest().hasRole("ENDPOINT_ADMIN")
-        .and()
-        .httpBasic();
-    */
+//        .anyRequest().permitAll();
+
+        .anyRequest().hasAuthority(RoleConstants.ADMIN_ROLE);
+//        .and()
+//        .httpBasic();
+
   }
 
 }

@@ -3,10 +3,44 @@ bremersee:
     allow-form-authentication-for-clients: false
     check-token-access: isAuthenticated()
     handle-approval-revocations-as-expiry: false
-    jwt-key-pair-alias: ${JWT_KEY_PAIR_ALIAS:jwt}
-    jwt-key-pair-password: ${JWT_KEY_PAIR_PASSWORD:changeit}
-    jwt-key-store-location: ${JWT_KEY_STORE_LOCATION:classpath:jwt.jks}
-    jwt-key-store-password: ${JWT_KEY_STORE_PASSWORD:changeit}
+    jwt-signing-key: |
+      -----BEGIN RSA PRIVATE KEY-----
+      MIIEogIBAAKCAQEAthqh5Zo/B0D3ug7WILthKnluhbivMlVFM4eRnSPh+yvbSqJp
+      JwGqnpxD8VzWod8UF+L9aqRUNc2KgAY957LLoRwac2DVQaaFVZViqdyrOO9MuYcE
+      3pGQ5eY3hPso0uohuVYKffWDDAqP1EKiKe9DDTWR6xGYxhPH42hxCfinvP6HfSaw
+      wq/wrFlu7SH9as+ew1jJmeNnj5oeNlE9IQ+t9hYlXPcW+XALGDbVLrwxHXq95V0Z
+      TrI+R1KWFH08jwO2oik4jI3sHK877aa+YEdXJee3wSCBin0NBUooGJDRQgYQ+eZB
+      4LtSUd53jHXSKj9ng9AY+ep/AVzAXjd0wU7eSwIDAQABAoIBAC14m/l1mQxqJBGA
+      9+XndB1Dgh4A3jpewW9bCDipR5nMuy65PDGBwIVndq2zpWJ5Dg7i3q18yAxBPTa3
+      mEidRCyAFHi/8rA4cO3MZf0NPXHziwB+nvAmf/xwDmf1wR1dWjtpqSgHoIfmsUBq
+      vQxkkqUfPcbpN3Eqaky1/Rfkz5motmLHV+onahNxrlwgrNZo65LSybxSZCcx+8o7
+      GzTRP5+rf/4nJx7tpP4+1Tg2zI+ieLAPHPebrZQVbRxtBz0nsKjWMA32ntIyumBZ
+      aR78jZxks3wGM0eczFNKs6DEBTOP06JVbGKRkmUwe7al6+ZWjNXDJ7uBTyjGrkth
+      VpFc8ZECgYEA8CguJCM1lxd3GG88AhMjliflijl3H8dFK0puz3KaxAXhWDTxMBEo
+      NRVOa14Favkbv5CIfYsGdpV0RZJBHQDo2vAqJwuR8F+GIS3xYmOnAbN9lIXwrQyC
+      5YH1z0EgcWYGcZVpjCvFYG6rr/cA04rCWhkgv9sPgo4IH2t6VEL+E9sCgYEAwh4K
+      5XCMvEOEhLC9VRitzzb9MSunsfxYP/yB6IYw022siPykGgOHE5gckdi5I8MpPqpP
+      cxZkZzNrxNREj3d4PuQc8wsZXY2wca/jZCGE4LEN+aOc6ILTUe3ktSWxn98sekaJ
+      Wq9CYVIbDr6c/p5y76Rc9goGeQrzdw+7bi8uolECgYB1xY6TJD0kolpCPlJ0RgR+
+      n4Qem/3CNMvD5hWfX/lrxeJzikr5IoDQP2mcl5galJ05/VwiDOqXfsVtVMLfwVFw
+      BLT3PuJLudyiKtCkSnBdEjO0gVa81lTezjPIdoy9b6YbT4VaOyDpIHzLp1rdYr/a
+      xVXdIEVj5dkv51ovNkc5XwKBgDhapGsrm4/kQgqLjMuxmHP50NN/ivWe/rfExKoO
+      mwomYtp6DeIHeCV2GYU117nMJKMuqlYNACT9xqGjxiuoUV5gtw7QABMq2TiICYm+
+      OWdJv3bjyt+ta0/zslvsj36MOctdwu5yxuCeB4DmUYmR0mhD3UEIdAyb40aDaLR6
+      Oh2hAoGAKWsYRJ+08ww1H3d/DrRwrAWuF24lLQZ4uFfPwPGzS68j3HeVHYEf+mbj
+      JUVRzMKqA46+mQYaj8JNoK9qgBmRxPNZYmzmcY9lGW4/QqDnHPICxCsmyGI/GZy8
+      pg0uvTQiDY+a4dygdAK4t1Ne6I/YnrG+pxkVoioQw+FQCK+qoKM=
+      -----END RSA PRIVATE KEY-----
+    jwt-verifier-key: |
+      -----BEGIN PUBLIC KEY-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAthqh5Zo/B0D3ug7WILth
+      KnluhbivMlVFM4eRnSPh+yvbSqJpJwGqnpxD8VzWod8UF+L9aqRUNc2KgAY957LL
+      oRwac2DVQaaFVZViqdyrOO9MuYcE3pGQ5eY3hPso0uohuVYKffWDDAqP1EKiKe9D
+      DTWR6xGYxhPH42hxCfinvP6HfSawwq/wrFlu7SH9as+ew1jJmeNnj5oeNlE9IQ+t
+      9hYlXPcW+XALGDbVLrwxHXq95V0ZTrI+R1KWFH08jwO2oik4jI3sHK877aa+YEdX
+      Jee3wSCBin0NBUooGJDRQgYQ+eZB4LtSUd53jHXSKj9ng9AY+ep/AVzAXjd0wU7e
+      SwIDAQAB
+      -----END PUBLIC KEY-----
     no-scope-description-available: Sorry, there's no description of this scope.
     realm: ${REALM:oauth2/client}
     ssl-only: false
@@ -139,15 +173,15 @@ logging:
     org.bremersee: debug
     org.springframework: info
 
-management:
-  server:
-    servlet:
-      context-path: /management
+#management:
+#  server:
+#    servlet:
+#      context-path: /management
 
 server:
   port: ${SERVER_PORT:8080}
   servlet:
-    context-path: ${SERVER_CONTEXT_PATH:/authman}
+    context-path: ${SERVER_CONTEXT_PATH:/}
 
 spring:
   data:

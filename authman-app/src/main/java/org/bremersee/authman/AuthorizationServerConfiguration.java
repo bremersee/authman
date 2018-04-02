@@ -18,7 +18,6 @@ package org.bremersee.authman;
 
 import java.security.KeyPair;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.bremersee.authman.domain.OAuth2AccessTokenRepository;
 import org.bremersee.authman.domain.OAuth2ApprovalRepository;
 import org.bremersee.authman.domain.OAuth2RefreshTokenRepository;
@@ -45,6 +44,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Christian Bremer
@@ -95,22 +95,27 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
   @Bean
   public JwtAccessTokenConverter jwtAccessTokenConverter() {
 
-    final DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
-    final KeyStoreKeyFactory keyStoreFactory = new KeyStoreKeyFactory(
-        resourceLoader.getResource(properties.getJwtKeyStoreLocation()),
-        properties.getJwtKeyStorePassword().toCharArray());
-
-    final KeyPair keyPair;
-    if (StringUtils.isBlank(properties.getJwtKeyPairPassword())) {
-      keyPair = keyStoreFactory.getKeyPair(properties.getJwtKeyPairAlias());
-    } else {
-      keyPair = keyStoreFactory.getKeyPair(
-          properties.getJwtKeyPairAlias(),
-          properties.getJwtKeyPairPassword().toCharArray());
-    }
-
     final JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-    converter.setKeyPair(keyPair);
+    if (org.springframework.util.StringUtils.hasText(properties.getJwtSigningKey())) {
+      converter.setSigningKey(properties.getJwtSigningKey());
+      if (StringUtils.hasText(properties.getJwtVerifierKey())) {
+        converter.setVerifierKey(properties.getJwtVerifierKey());
+      }
+    } else {
+      final DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
+      final KeyStoreKeyFactory keyStoreFactory = new KeyStoreKeyFactory(
+          resourceLoader.getResource(properties.getJwtKeyStoreLocation()),
+          properties.getJwtKeyStorePassword().toCharArray());
+      final KeyPair keyPair;
+      if (!StringUtils.hasText(properties.getJwtKeyPairPassword())) {
+        keyPair = keyStoreFactory.getKeyPair(properties.getJwtKeyPairAlias());
+      } else {
+        keyPair = keyStoreFactory.getKeyPair(
+            properties.getJwtKeyPairAlias(),
+            properties.getJwtKeyPairPassword().toCharArray());
+      }
+      converter.setKeyPair(keyPair);
+    }
     return converter;
   }
 

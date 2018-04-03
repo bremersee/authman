@@ -1,4 +1,10 @@
 bremersee:
+  actuator:
+    users:
+      - name: actuator
+        password: secret4ACTUATOR
+        authorities:
+          - ROLE_ACTUATOR
   ldaptive:
     ldap-url: ${LDAP_URL:ldaps://example.org:636}
     use-ssl: ${LDAP_SSL:true}
@@ -34,6 +40,9 @@ eureka:
     prefer-same-zone-eureka: true
     service-url:
       defaultZone: http://192.168.1.16:8761/eureka/
+  instance:
+    health-check-url-path: /actuator/health
+    home-page-url-path: /actuator/info
 
 logging:
   level:
@@ -41,6 +50,12 @@ logging:
     org.bremersee: debug
     org.springframework: info
 #    org.springframework.security.oauth2: debug
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,env
 
 server:
   port: ${SERVER_PORT:8090}
@@ -52,12 +67,12 @@ server:
 security:
   oauth2:
     client:
-      client-id: internal
+      client-id: internal-client
       client-secret: secret4INTERNAL
     resource:
       jwt:
-        key-uri: http://localhost:8080/authman/oauth/token_key
-      token-info-uri: http://localhost:8080/authman/oauth/check_token
+        key-uri: http://localhost:8080/oauth/token_key
+      token-info-uri: http://localhost:8080/oauth/check_token
       prefer-token-info: true
 
 spring:

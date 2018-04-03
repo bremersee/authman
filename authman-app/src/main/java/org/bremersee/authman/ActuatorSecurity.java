@@ -20,25 +20,29 @@ import org.bremersee.authman.security.core.RoleConstants;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
  * @author Christian Bremer
  */
-//@Configuration
-//@Order(99)
+@Configuration
+@Order(101)
 public class ActuatorSecurity extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.requestMatcher(EndpointRequest.toAnyEndpoint()).authorizeRequests()
-//        .anyRequest().permitAll();
-
-        .anyRequest().hasAuthority(RoleConstants.ADMIN_ROLE);
-//        .and()
-//        .httpBasic();
-
+    http
+        .requestMatcher(EndpointRequest.toAnyEndpoint())
+        .csrf().disable()
+        .httpBasic().realmName("actuator")
+        .and()
+        .requestMatcher(EndpointRequest.toAnyEndpoint())
+        .authorizeRequests()
+        .antMatchers(HttpMethod.GET, "/actuator/health").permitAll()
+        .anyRequest()
+        .hasAuthority(RoleConstants.ACTUATOR_ROLE);
   }
 
 }

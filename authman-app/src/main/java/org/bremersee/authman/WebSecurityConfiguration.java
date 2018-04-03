@@ -44,6 +44,7 @@ import org.springframework.security.web.authentication.preauth.AbstractPreAuthen
 import org.springframework.security.web.authentication.preauth.x509.X509AuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
 
 /**
  * @author Christian Bremer
@@ -190,14 +191,14 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .addFilterAfter(googleCallbackFilter(), AbstractPreAuthenticatedProcessingFilter.class)
         .addFilterAfter(gitHubCallbackFilter(), AbstractPreAuthenticatedProcessingFilter.class)
         .addFilterAfter(oAuth2MergeFilter(), AbstractPreAuthenticatedProcessingFilter.class)
-        .formLogin().loginPage(LOGIN_PAGE).permitAll()
-        .and()
-        .logout().logoutSuccessUrl("/logged-out")
-        .and()
-        .requestMatcher(EndpointRequest.toAnyEndpoint()).authorizeRequests()
-        .anyRequest().hasAuthority(RoleConstants.ADMIN_ROLE)
-        .and()
-        .requestMatcher(new NegatedRequestMatcher(new AntPathRequestMatcher("/api/**")))
+
+
+        .requestMatcher(new NegatedRequestMatcher(
+            new OrRequestMatcher(
+                new AntPathRequestMatcher("/api/**"),
+                new AntPathRequestMatcher("/actuator/**"))))
+
+
         .authorizeRequests()
         .antMatchers(HttpMethod.GET, "/merge*").permitAll()
         .antMatchers(HttpMethod.GET, "/register*").permitAll()
@@ -205,7 +206,14 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.GET, "/password-reset*").permitAll()
         .antMatchers(HttpMethod.POST, "/password-reset*").permitAll()
         .antMatchers(HttpMethod.GET, "/logged-out*").permitAll()
-        .anyRequest().authenticated()
+        .anyRequest().hasAuthority(RoleConstants.USER_ROLE)
+
+        .and()
+        .formLogin().loginPage(LOGIN_PAGE).permitAll()
+
+        .and()
+        .logout().logoutSuccessUrl("/logged-out")
+
         .and()
         .rememberMe()
     ;

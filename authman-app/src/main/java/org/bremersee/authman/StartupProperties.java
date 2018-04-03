@@ -38,6 +38,8 @@ public class StartupProperties {
    */
   private UserProfileCreateRequestDto admin = new UserProfileCreateRequestDto();
 
+  private UserProfileCreateRequestDto actuator = new UserProfileCreateRequestDto();
+
   public StartupProperties() {
     admin.setUserName("admin");
     admin.setPassword("secret4ADMIN");
@@ -45,5 +47,12 @@ public class StartupProperties {
     admin.setEmail("admin@bremersee.org");
     admin.setPreferredLocale("de_DE");
     admin.setPreferredTimeZoneId("Europe/Berlin");
+
+    actuator.setUserName("actuator");
+    actuator.setPassword("secret4ACTUATOR");
+    actuator.setDisplayName("Eva Actuator");
+    actuator.setEmail("actuator@bremersee.org");
+    actuator.setPreferredLocale("de_DE");
+    actuator.setPreferredTimeZoneId("Europe/Berlin");
   }
 }

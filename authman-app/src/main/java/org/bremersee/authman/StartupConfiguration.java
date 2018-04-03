@@ -83,6 +83,7 @@ public class StartupConfiguration {
     @Override
     public void run() {
       createAdmin();
+      createActuator();
       createScopes();
       createClients();
     }
@@ -101,6 +102,19 @@ public class StartupConfiguration {
       roleService.addRole(adminName, RoleConstants.DEVELOPER_ROLE);
       roleService.addRole(adminName, RoleConstants.ADMIN_ROLE);
       roleService.addRole(adminName, RoleConstants.SAMBA_ADMIN_ROLE);
+    }
+
+    private void createActuator() {
+
+      log.info("Creating actuator ...");
+
+      if (!userService.isUserProfileExisting(startupProperties.getActuator().getUserName())) {
+        userService.createUserProfile(
+            startupProperties.getActuator(), false, false);
+      }
+
+      final String actuatorName = startupProperties.getActuator().getUserName();
+      roleService.addRole(actuatorName, RoleConstants.ACTUATOR_ROLE);
     }
 
     private void createScopes() {

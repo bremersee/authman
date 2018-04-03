@@ -16,28 +16,72 @@
 
 package org.bremersee.authman.samba;
 
+import lombok.extern.slf4j.Slf4j;
+import org.bremersee.authman.security.core.RoleConstants;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 /**
  * @author Christian Bremer
  */
+@Order(101)
 @Configuration
-@Order(99)
+@EnableConfigurationProperties(ActuatorProperties.class)
+@Slf4j
 public class ActuatorSecurity extends WebSecurityConfigurerAdapter {
+
+  private final ActuatorProperties properties;
+
+  @Autowired
+  public ActuatorSecurity(ActuatorProperties properties) {
+    this.properties = properties;
+  }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.requestMatcher(EndpointRequest.toAnyEndpoint()).authorizeRequests()
-        .anyRequest().permitAll();
-    /*
-        .anyRequest().hasRole("ENDPOINT_ADMIN")
+    http
+        .requestMatcher(EndpointRequest.toAnyEndpoint())
+        .userDetailsService(userDetailsService())
+        .csrf().disable()
+        .httpBasic().realmName("actuator")
         .and()
-        .httpBasic();
-    */
+        .requestMatcher(EndpointRequest.toAnyEndpoint())
+        .authorizeRequests()
+        .antMatchers(HttpMethod.GET, "/actuator/health").permitAll()
+        .antMatchers(HttpMethod.GET, "/actuator/info").permitAll()
+        .anyRequest()
+        .hasAuthority(RoleConstants.ACTUATOR_ROLE);
+  }
+
+  @Bean
+  @Override
+  public UserDetailsService userDetailsService() {
+
+    log.info("Building user details service with {}", properties);
+    final PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    final UserDetails[] userDetails = properties.getUsers().stream().map(
+        simpleUser -> User.builder()
+            .username(simpleUser.getName())
+            .password(simpleUser.getPassword())
+            .authorities(
+                simpleUser.getAuthorities().toArray(new String[simpleUser.getAuthorities().size()]))
+            .passwordEncoder(encoder::encode)
+            .build())
+        .toArray(UserDetails[]::new);
+    return new InMemoryUserDetailsManager(userDetails);
   }
 
 }

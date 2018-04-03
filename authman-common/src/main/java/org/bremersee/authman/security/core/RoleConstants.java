@@ -21,6 +21,8 @@ package org.bremersee.authman.security.core;
  */
 public abstract class RoleConstants {
 
+  public static final String ACTUATOR_ROLE = "ROLE_ACTUATOR";
+
   public static final String ADMIN_ROLE = "ROLE_ADMIN";
 
   public static final String SAMBA_ADMIN_ROLE = "ROLE_SAMBA_ADMIN";
@@ -36,6 +38,7 @@ public abstract class RoleConstants {
   public static final String OAUTH2_CLIENT_ROLE = "ROLE_OAUTH2_CLIENT";
 
   public static String[] USER_ROLES = {
+      ACTUATOR_ROLE,
       ADMIN_ROLE,
       USER_ROLE,
       DEVELOPER_ROLE,
@@ -45,7 +48,8 @@ public abstract class RoleConstants {
 
   public static String[] OAUTH2_CLIENT_ROLES = {
       OAUTH2_CLIENT_ROLE,
-      ADMIN_ROLE
+      ADMIN_ROLE,
+      ACTUATOR_ROLE
   };
 
   private RoleConstants() {

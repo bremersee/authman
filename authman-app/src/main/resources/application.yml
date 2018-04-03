@@ -173,10 +173,11 @@ logging:
     org.bremersee: debug
     org.springframework: info
 
-#management:
-#  server:
-#    servlet:
-#      context-path: /management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,env
 
 server:
   port: ${SERVER_PORT:8080}
@@ -217,7 +218,7 @@ spring:
 #      client:
 #        registration:
 #          bremersee:
-#            client-id: internal
+#            client-id: internal-client
 #            client-secret: secret4INTERNAL
 #            client-name: Client for user scope
 #            provider: bremersee
@@ -234,5 +235,16 @@ spring:
 #            user-info-uri: http://localhost:7080/api/me
 #            jwk-set-uri: http://localhost:7080/token_keys
 #            user-name-attribute: name
+
+#security:
+#  oauth2:
+#    client:
+#      client-id: internal-client
+#      client-secret: secret4INTERNAL
+#    resource:
+#      jwt:
+#        key-uri: http://localhost:8080/authman/oauth/token_key
+#      token-info-uri: http://localhost:8080/authman/oauth/check_token
+#      prefer-token-info: true
 
 # curl -v --data "grant_type=refresh_token&client_id=THE_CLIENT_ID&refresh_token=THE_REFRESH_TOKEN" http://localhost:8080/oauth/token

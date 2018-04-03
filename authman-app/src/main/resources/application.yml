@@ -207,6 +207,9 @@ spring:
       mail.smtp.ssl.enable: ${MAIL_SMTP_SSL_ENABLE:false}
   messages:
     basename: messages
+  sleuth:
+    sampler:
+      probability: 1.0
   thymeleaf:
     cache: false
   zipkin:

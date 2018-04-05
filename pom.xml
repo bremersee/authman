@@ -154,6 +154,7 @@
     <module>authman-common</module>
     <module>authman-app</module>
     <module>authman-samba-app</module>
+    <module>authman-mailcow-app</module>
   </modules>
 
   <dependencyManagement>

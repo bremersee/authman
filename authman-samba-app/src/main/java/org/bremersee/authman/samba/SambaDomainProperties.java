@@ -68,6 +68,9 @@ public class SambaDomainProperties implements Serializable {
 
   private SearchScope userFindOneSearchScope = SearchScope.ONELEVEL;
 
+  private boolean usingSudo = true;
+
+  private String sudoBinary = "/usr/bin/sudo";
 
   private String sambaToolBinary = "/usr/bin/samba-tool";
 

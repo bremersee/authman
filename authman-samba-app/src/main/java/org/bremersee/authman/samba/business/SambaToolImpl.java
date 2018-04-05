@@ -81,6 +81,9 @@ public class SambaToolImpl implements SambaTool {
 
     final String unixHomeDir = properties.getUnixHomeDirTemplate().replace("{}", userName);
     final List<String> commands = new ArrayList<>();
+    if (properties.isUsingSudo()) {
+      commands.add(properties.getSudoBinary());
+    }
     commands.add(properties.getSambaToolBinary());
     commands.add(SUB_CMD_USER_MANAGEMENT);
     commands.add(USER_CMD_CREATE);
@@ -112,6 +115,9 @@ public class SambaToolImpl implements SambaTool {
   public void deleteUser(@NotNull final String userName) {
 
     final List<String> commands = new ArrayList<>();
+    if (properties.isUsingSudo()) {
+      commands.add(properties.getSudoBinary());
+    }
     commands.add(properties.getSambaToolBinary());
     commands.add(SUB_CMD_USER_MANAGEMENT);
     commands.add(USER_CMD_DELETE);
@@ -132,6 +138,9 @@ public class SambaToolImpl implements SambaTool {
       @NotNull final String newPassword) {
 
     final List<String> commands = new ArrayList<>();
+    if (properties.isUsingSudo()) {
+      commands.add(properties.getSudoBinary());
+    }
     commands.add(properties.getSambaToolBinary());
     commands.add(SUB_CMD_USER_MANAGEMENT);
     commands.add(USER_CMD_SET_PASSWORD);
@@ -153,6 +162,9 @@ public class SambaToolImpl implements SambaTool {
   public void addGroup(String groupName) {
 
     final List<String> commands = new ArrayList<>();
+    if (properties.isUsingSudo()) {
+      commands.add(properties.getSudoBinary());
+    }
     commands.add(properties.getSambaToolBinary());
     commands.add(SUB_CMD_GROUP_MANAGEMENT);
     commands.add(GROUP_CMD_ADD);
@@ -173,6 +185,9 @@ public class SambaToolImpl implements SambaTool {
   public void deleteGroup(String groupName) {
 
     final List<String> commands = new ArrayList<>();
+    if (properties.isUsingSudo()) {
+      commands.add(properties.getSudoBinary());
+    }
     commands.add(properties.getSambaToolBinary());
     commands.add(SUB_CMD_GROUP_MANAGEMENT);
     commands.add(GROUP_CMD_DELETE);

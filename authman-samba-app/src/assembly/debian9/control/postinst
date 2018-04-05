@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+SUDO_FILE=/etc/sudoers
+SUDO_ENTRY="smb-con ALL = NOPASSWD: /usr/bin/samba-tool"
+
 /usr/bin/getent passwd smb-con
 if [ ! $? -eq 0 ]; then
   /usr/sbin/adduser --system --home /var/lib/smb-con --shell /bin/false --no-create-home --group --disabled-login smb-con
@@ -15,6 +18,11 @@ fi
 
 if [ ! -e /etc/systemd/system/smb-con.service ]; then
   ln -s /lib/systemd/system/smb-con.service /etc/systemd/system/smb-con.service
+fi
+
+grep -q "$SUDO_ENTRY" "$SUDO_FILE"
+if [ $? -eq 1 ]; then
+  echo -e "$SUDO_ENTRY" >> "$SUDO_FILE"
 fi
 
 /bin/systemctl enable smb-con.service

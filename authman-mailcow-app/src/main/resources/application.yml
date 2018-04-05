@@ -1,0 +1,65 @@
+bremersee:
+  actuator:
+    users:
+      - name: actuator
+        password: secret4ACTUATOR
+        authorities:
+          - ROLE_ACTUATOR
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: true
+    prefer-same-zone-eureka: true
+    service-url:
+      defaultZone: http://eureka:8761/eureka/
+  instance:
+    health-check-url-path: /actuator/health
+    home-page-url-path: /actuator/info
+
+logging:
+  level:
+    ROOT: info
+    org.bremersee: debug
+    org.springframework: info
+#    org.springframework.security.oauth2: debug
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,env
+
+server:
+  port: ${SERVER_PORT:8091}
+  tomcat:
+    remote-ip-header: x-forwarded-for
+    protocol-header: x-forwarded-proto
+    port-header: x-forwarded-port
+
+security:
+  oauth2:
+    client:
+      client-id: internal-client
+      client-secret: secret4INTERNAL
+    resource:
+      jwt:
+        key-uri: http://localhost:8080/oauth/token_key
+      token-info-uri: http://localhost:8080/oauth/check_token
+      prefer-token-info: true
+
+spring:
+  jackson:
+    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
+    default-property-inclusion: non_null
+    property-naming-strategy: LOWER_CAMEL_CASE
+    locale: de_DE
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+    time-zone: Europe/Berlin
+  sleuth:
+    sampler:
+      probability: 1.0
+  zipkin:
+    enabled: false
+    base-url: http://localhost:9411/

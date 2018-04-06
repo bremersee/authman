@@ -92,10 +92,56 @@
       <groupId>org.springframework.retry</groupId>
       <artifactId>spring-retry</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <!--
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger2</artifactId>
+      <version>2.8.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-data-rest</artifactId>
+      <version>2.8.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-bean-validators</artifactId>
+      <version>2.8.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger-ui</artifactId>
+      <version>2.8.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-schema</artifactId>
+      <version>2.8.0</version>
+    </dependency>
+    -->
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-devtools</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
       <scope>runtime</scope>
     </dependency>
 
@@ -151,7 +197,6 @@
     </pluginManagement>
 
     <plugins>
-      <!--
       <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swagger-codegen-maven-plugin</artifactId>
@@ -163,7 +208,7 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <inputSpec>${main.basedir}/src/swagger/samba_connector.yml</inputSpec>
+              <inputSpec>${main.basedir}/src/swagger/user_profile_listener.yml</inputSpec>
               <language>spring</language>
               <generateSupportingFiles>false</generateSupportingFiles>
               <configOptions>
@@ -171,9 +216,9 @@
                 <interfaceOnly>true</interfaceOnly>
                 <java8>true</java8>
                 <dateLibrary>java8</dateLibrary>
-                <modelPackage>org.bremersee.swagger.authman.samba.model</modelPackage>
-                <apiPackage>org.bremersee.swagger.authman.samba.api</apiPackage>
-                <invokerPackage>org.bremersee.swagger.authman.samba.invoker</invokerPackage>
+                <modelPackage>org.bremersee.swagger.authman.user.model</modelPackage>
+                <apiPackage>org.bremersee.swagger.authman.user.api</apiPackage>
+                <invokerPackage>org.bremersee.swagger.authman.user.invoker</invokerPackage>
                 <serializableModel>true</serializableModel>
               </configOptions>
               <environmentVariables>
@@ -184,7 +229,6 @@
           </execution>
         </executions>
       </plugin>
-      -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>

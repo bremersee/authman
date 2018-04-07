@@ -24,6 +24,11 @@
       <artifactId>authman-common</artifactId>
       <version>1.0.0-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>org.bremersee</groupId>
+      <artifactId>authman-samba-contract</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
 
     <dependency>
       <groupId>commons-io</groupId>
@@ -163,6 +168,7 @@
     </pluginManagement>
 
     <plugins>
+      <!--
       <plugin>
         <groupId>io.swagger</groupId>
         <artifactId>swagger-codegen-maven-plugin</artifactId>
@@ -195,6 +201,7 @@
           </execution>
         </executions>
       </plugin>
+      -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>

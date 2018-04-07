@@ -16,7 +16,7 @@
 
 package org.bremersee.swagger.authman.samba;
 
-import org.bremersee.swagger.authman.samba.client.SambaConnectorControllerApi;
+import org.bremersee.swagger.authman.samba.api.SambaConnectorControllerApi;
 import org.springframework.cloud.openfeign.FeignClient;
 
 /**

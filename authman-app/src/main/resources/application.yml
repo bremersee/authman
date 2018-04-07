@@ -152,6 +152,11 @@ bremersee:
       email: ${ADMIN_EMAIL:admin@bremersee.org}
       preferred-locale: ${ADMIN_LOCALE:de_DE}
       preferred-time-zone-id: ${ADMIN_TIME_ZONE:Europe/Berlin}
+#  bremersee.user-listener:
+#    http-listeners:
+#      - name: test
+#        url: http://localhost:8091
+#        client-id: todo
   user-service:
     min-search-length: ${USER_MIN_SEARCH_LENGTH:3}
 

@@ -18,7 +18,7 @@ package org.bremersee.authman;
 
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.swagger.authman.samba.SambaConnectorMock;
-import org.bremersee.swagger.authman.samba.client.SambaConnectorControllerApi;
+import org.bremersee.swagger.authman.samba.api.SambaConnectorControllerApi;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

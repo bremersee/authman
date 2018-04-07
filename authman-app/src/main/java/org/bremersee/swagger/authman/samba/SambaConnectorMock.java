@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.swagger.authman.samba.client.SambaConnectorControllerApi;
+import org.bremersee.swagger.authman.samba.api.SambaConnectorControllerApi;
 import org.bremersee.swagger.authman.samba.model.BooleanWrapper;
 import org.bremersee.swagger.authman.samba.model.Names;
 import org.bremersee.swagger.authman.samba.model.Password;

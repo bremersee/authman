@@ -152,6 +152,8 @@
 
   <modules>
     <module>authman-common</module>
+    <module>authman-listener-contract</module>
+    <module>authman-samba-contract</module>
     <module>authman-app</module>
     <module>authman-samba-app</module>
     <module>authman-mailcow-app</module>

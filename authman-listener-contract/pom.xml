@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>authman</artifactId>
+    <groupId>org.bremersee</groupId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>authman-listener-contract</artifactId>
+  <name>authman-listener-contract</name>
+
+  <properties>
+    <main.basedir>${basedir}/..</main.basedir>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.swagger</groupId>
+      <artifactId>swagger-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <configuration>
+            <archive>
+              <addMavenDescriptor>true</addMavenDescriptor>
+              <index>true</index>
+              <manifest>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+              </manifest>
+              <manifestEntries>
+                <Product-Name>${project.artifactId}</Product-Name>
+                <Product-Version>${project.version}</Product-Version>
+                <Product-Vendor>${project.organization.name}</Product-Vendor>
+                <!--suppress MavenModelInspection -->
+                <Implementation-Build>${buildNumber}</Implementation-Build>
+              </manifestEntries>
+            </archive>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>io.swagger</groupId>
+        <artifactId>swagger-codegen-maven-plugin</artifactId>
+        <version>${swagger-codegen-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>user-profile-samba-service</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <templateDirectory>
+                ${project.basedir}/src/main/swagger/templates
+              </templateDirectory>
+              <inputSpec>${project.basedir}/src/main/swagger/user_profile_listener.yml</inputSpec>
+              <language>spring</language>
+              <generateSupportingFiles>false</generateSupportingFiles>
+              <configOptions>
+                <useTags>true</useTags>
+                <interfaceOnly>true</interfaceOnly>
+                <java8>true</java8>
+                <dateLibrary>java8</dateLibrary>
+                <modelPackage>org.bremersee.swagger.authman.listener.model</modelPackage>
+                <apiPackage>org.bremersee.swagger.authman.listener.api</apiPackage>
+                <invokerPackage>org.bremersee.swagger.authman.listener.invoker</invokerPackage>
+                <serializableModel>true</serializableModel>
+              </configOptions>
+              <environmentVariables>
+                <hideGenerationTimestamp />
+              </environmentVariables>
+              <output>${project.build.directory}/generated-sources</output>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>

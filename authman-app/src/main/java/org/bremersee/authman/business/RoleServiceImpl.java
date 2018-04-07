@@ -18,12 +18,14 @@ package org.bremersee.authman.business;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
 import org.bremersee.authman.domain.Role;
 import org.bremersee.authman.domain.RoleRepository;
+import org.bremersee.authman.listener.UserProfileListener;
 import org.bremersee.authman.security.core.RoleConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -37,9 +39,14 @@ public class RoleServiceImpl implements RoleService {
 
   private final RoleRepository roleRepository;
 
+  private final UserProfileListener userProfileListener;
+
   @Autowired
-  public RoleServiceImpl(final RoleRepository roleRepository) {
+  public RoleServiceImpl(
+      final RoleRepository roleRepository,
+      final UserProfileListener userProfileListener) {
     this.roleRepository = roleRepository;
+    this.userProfileListener = userProfileListener;
   }
 
   @Override
@@ -70,17 +77,20 @@ public class RoleServiceImpl implements RoleService {
   @Override
   public void deleteRole(@NotNull final String userName, @NotNull final String roleName) {
     roleRepository.deleteByRoleNameAndUserName(roleName, userName);
+    userProfileListener.onNewRoles(userName, getRoles(userName));
   }
 
   @Override
   public void deleteRoles(@NotNull final String userName) {
     roleRepository.deleteByUserName(userName);
+    userProfileListener.onNewRoles(userName, Collections.emptySet());
   }
 
   @Override
   public void addRole(@NotNull final String userName, @NotNull final String roleName) {
     if (roleRepository.countByRoleNameAndUserName(roleName, userName) == 0) {
       roleRepository.save(new Role(roleName, userName));
+      userProfileListener.onNewRoles(userName, getRoles(userName));
     }
   }
 
@@ -97,6 +107,6 @@ public class RoleServiceImpl implements RoleService {
         roleRepository.save(new Role(roleName, userName));
       }
     });
-
+    userProfileListener.onNewRoles(userName, getRoles(userName));
   }
 }

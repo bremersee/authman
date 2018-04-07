@@ -17,6 +17,8 @@
 package org.bremersee.authman.business;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,7 @@ import org.bremersee.authman.exception.InvalidEmailException;
 import org.bremersee.authman.exception.InvalidMobileException;
 import org.bremersee.authman.exception.NotFoundException;
 import org.bremersee.authman.exception.PasswordsNotMatchException;
+import org.bremersee.authman.listener.UserProfileListener;
 import org.bremersee.authman.mapper.UserProfileMapper;
 import org.bremersee.authman.model.SambaSettingsDto;
 import org.bremersee.authman.model.UserProfileCreateRequestDto;
@@ -65,6 +68,8 @@ public class UserProfileServiceImpl extends AbstractUserProfileService
 
   private final SambaConnectorService sambaConnectorService;
 
+  private final UserProfileListener userProfileListener;
+
   private int minSearchLength = 3;
 
   @Autowired
@@ -74,13 +79,15 @@ public class UserProfileServiceImpl extends AbstractUserProfileService
       UserProfileMapper userMapper,
       RoleService roleService,
       PasswordEncoder passwordEncoder,
-      SambaConnectorService sambaConnectorService) {
+      SambaConnectorService sambaConnectorService,
+      UserProfileListener userProfileListener) {
 
     super(validationProperties, userRepository);
     this.userMapper = userMapper;
     this.roleService = roleService;
     this.passwordEncoder = passwordEncoder;
     this.sambaConnectorService = sambaConnectorService;
+    this.userProfileListener = userProfileListener;
   }
 
   @Value("${bremersee.user-service.min-search-length:3}")
@@ -119,7 +126,10 @@ public class UserProfileServiceImpl extends AbstractUserProfileService
     }
 
     user = getUserRepository().save(user);
-    roleService.addRole(user.getUserName(), RoleConstants.USER_ROLE);
+
+    final Set<String> roles = new LinkedHashSet<>();
+    roles.add(RoleConstants.USER_ROLE);
+    roleService.setRoles(user.getUserName(), roles);
 
     if (sendNotification && !isPasswordEncrypted) {
       // TODO
@@ -127,6 +137,10 @@ public class UserProfileServiceImpl extends AbstractUserProfileService
 
     final UserProfileDto result = userMapper.mapToDto(user);
     log.info("User profile successfully created: {}", result);
+    userProfileListener.onCreateUserProfile(
+        result,
+        isPasswordEncrypted ? null : request.getPassword(),
+        roles);
     return result;
   }
 
@@ -221,6 +235,7 @@ public class UserProfileServiceImpl extends AbstractUserProfileService
     sambaConnectorService.updateSambaUserAsync(entity);
     final UserProfileDto result = userMapper.mapToDto(entity);
     log.info("User profile successfully updated: {}", result);
+    userProfileListener.onChangeUserProfile(result);
     return result;
   }
 
@@ -231,6 +246,7 @@ public class UserProfileServiceImpl extends AbstractUserProfileService
     roleService.deleteRoles(userName);
     getUserRepository().deleteByUserName(userName);
     sambaConnectorService.deleteUserAsync(userName);
+    userProfileListener.onDeleteUserProfile(userName);
   }
 
   @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -241,6 +257,7 @@ public class UserProfileServiceImpl extends AbstractUserProfileService
       userProfile.setEnabled(isEnabled);
       final UserProfile savedUserProfile = getUserRepository().save(userProfile);
       sambaConnectorService.updateSambaUserAsync(savedUserProfile);
+      userProfileListener.onChangeEnabledState(userName, isEnabled);
     });
   }
 
@@ -278,6 +295,7 @@ public class UserProfileServiceImpl extends AbstractUserProfileService
     userProfile.setPassword(passwordEncoder.encode(newPassword));
     getUserRepository().save(userProfile);
     sambaConnectorService.updateUserPasswordAsync(userName, newPassword);
+    userProfileListener.onNewPassword(userName, newPassword);
   }
 
   @PreAuthorize("hasRole('ROLE_ADMIN') or authentication.name == #userName")
@@ -296,6 +314,7 @@ public class UserProfileServiceImpl extends AbstractUserProfileService
     userProfile.setEmail(email);
     final UserProfile savedUserProfile = getUserRepository().save(userProfile);
     sambaConnectorService.updateSambaUserAsync(savedUserProfile);
+    userProfileListener.onNewPassword(userName, email);
   }
 
   @PreAuthorize("hasRole('ROLE_ADMIN') or authentication.name == #userName")
@@ -307,6 +326,7 @@ public class UserProfileServiceImpl extends AbstractUserProfileService
           if (!userName.equals(userProfile.getUserName())) {
             userProfile.setMobile(null);
             getUserRepository().save(userProfile);
+            userProfileListener.onDeleteMobile(userProfile.getUserName(), userProfile.getMobile());
           }
         });
 
@@ -316,6 +336,7 @@ public class UserProfileServiceImpl extends AbstractUserProfileService
     userProfile.setMobile(mobile);
     final UserProfile savedUserProfile = getUserRepository().save(userProfile);
     sambaConnectorService.updateSambaUserAsync(savedUserProfile);
+    userProfileListener.onNewMobile(userName, mobile);
   }
 
 }

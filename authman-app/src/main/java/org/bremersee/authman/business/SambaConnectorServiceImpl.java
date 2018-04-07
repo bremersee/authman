@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.authman.domain.UserProfile;
 import org.bremersee.authman.model.SambaSettingsDto;
-import org.bremersee.swagger.authman.samba.client.SambaConnectorControllerApi;
+import org.bremersee.swagger.authman.samba.api.SambaConnectorControllerApi;
 import org.bremersee.swagger.authman.samba.model.BooleanWrapper;
 import org.bremersee.swagger.authman.samba.model.Name;
 import org.bremersee.swagger.authman.samba.model.Names;

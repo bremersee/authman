@@ -198,40 +198,12 @@
 
     <plugins>
       <plugin>
-        <groupId>io.swagger</groupId>
-        <artifactId>swagger-codegen-maven-plugin</artifactId>
-        <version>${swagger-codegen-maven-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>user-profile-samba-service</id>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-            <configuration>
-              <inputSpec>${main.basedir}/src/swagger/user_profile_listener.yml</inputSpec>
-              <language>spring</language>
-              <generateSupportingFiles>false</generateSupportingFiles>
-              <configOptions>
-                <useTags>true</useTags>
-                <interfaceOnly>true</interfaceOnly>
-                <java8>true</java8>
-                <dateLibrary>java8</dateLibrary>
-                <modelPackage>org.bremersee.swagger.authman.user.model</modelPackage>
-                <apiPackage>org.bremersee.swagger.authman.user.api</apiPackage>
-                <invokerPackage>org.bremersee.swagger.authman.user.invoker</invokerPackage>
-                <serializableModel>true</serializableModel>
-              </configOptions>
-              <environmentVariables>
-                <hideGenerationTimestamp />
-              </environmentVariables>
-              <output>${project.build.directory}/generated-sources</output>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

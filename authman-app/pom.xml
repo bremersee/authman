@@ -24,6 +24,16 @@
       <artifactId>authman-common</artifactId>
       <version>1.0.0-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>org.bremersee</groupId>
+      <artifactId>authman-listener-contract</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bremersee</groupId>
+      <artifactId>authman-samba-contract</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
 
     <dependency>
       <groupId>org.bouncycastle</groupId>
@@ -220,75 +230,77 @@
     </pluginManagement>
 
     <plugins>
-      <plugin>
-        <groupId>io.swagger</groupId>
-        <artifactId>swagger-codegen-maven-plugin</artifactId>
-        <version>${swagger-codegen-maven-plugin.version}</version>
-        <executions>
-          <execution>
-            <id>samba-connector-client</id>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-            <configuration>
-              <templateDirectory>
-                ${project.basedir}/src/main/swagger-codegen/templates
-              </templateDirectory>
-              <inputSpec>${main.basedir}/src/swagger/samba_connector.yml</inputSpec>
-              <language>spring</language>
-              <library>spring-cloud</library>
-              <generateSupportingFiles>false</generateSupportingFiles>
-              <configOptions>
-                <useTags>true</useTags>
-                <dateLibrary>java8</dateLibrary>
-                <modelPackage>org.bremersee.swagger.authman.samba.model</modelPackage>
-                <apiPackage>org.bremersee.swagger.authman.samba.client</apiPackage>
-                <configPackage>org.bremersee.swagger.authman.samba.configuration</configPackage>
-                <generateApiDocumentation>false</generateApiDocumentation>
-                <generateApiTests>false</generateApiTests>
-                <generateModelDocumentation>false</generateModelDocumentation>
-                <generateModelTests>false</generateModelTests>
-                <serializableModel>true</serializableModel>
-              </configOptions>
-              <environmentVariables>
-                <hideGenerationTimestamp />
-              </environmentVariables>
-              <output>${project.build.directory}/generated-sources</output>
-            </configuration>
-          </execution>
-          <execution>
-            <id>user-profile-listener-client</id>
-            <goals>
-              <goal>generate</goal>
-            </goals>
-            <configuration>
-              <templateDirectory>
-                ${project.basedir}/src/main/swagger-codegen/templates
-              </templateDirectory>
-              <inputSpec>${main.basedir}/src/swagger/user_profile_listener.yml</inputSpec>
-              <language>spring</language>
-              <library>spring-cloud</library>
-              <generateSupportingFiles>false</generateSupportingFiles>
-              <configOptions>
-                <useTags>true</useTags>
-                <dateLibrary>java8</dateLibrary>
-                <modelPackage>org.bremersee.swagger.authman.listener.model</modelPackage>
-                <apiPackage>org.bremersee.swagger.authman.listener.client</apiPackage>
-                <configPackage>org.bremersee.swagger.authman.listener.configuration</configPackage>
-                <generateApiDocumentation>false</generateApiDocumentation>
-                <generateApiTests>false</generateApiTests>
-                <generateModelDocumentation>false</generateModelDocumentation>
-                <generateModelTests>false</generateModelTests>
-                <serializableModel>true</serializableModel>
-              </configOptions>
-              <environmentVariables>
-                <hideGenerationTimestamp />
-              </environmentVariables>
-              <output>${project.build.directory}/generated-sources</output>
-            </configuration>
-          </execution>
+      <!--
+  <plugin>
+    <groupId>io.swagger</groupId>
+    <artifactId>swagger-codegen-maven-plugin</artifactId>
+    <version>${swagger-codegen-maven-plugin.version}</version>
+    <executions>
+      <execution>
+        <id>samba-connector-client</id>
+        <goals>
+          <goal>generate</goal>
+        </goals>
+        <configuration>
+          <templateDirectory>
+            ${project.basedir}/src/main/swagger-codegen/templates
+          </templateDirectory>
+          <inputSpec>${main.basedir}/src/swagger/samba_connector.yml</inputSpec>
+          <language>spring</language>
+          <library>spring-cloud</library>
+          <generateSupportingFiles>false</generateSupportingFiles>
+          <configOptions>
+            <useTags>true</useTags>
+            <dateLibrary>java8</dateLibrary>
+            <modelPackage>org.bremersee.swagger.authman.samba.model</modelPackage>
+            <apiPackage>org.bremersee.swagger.authman.samba.client</apiPackage>
+            <configPackage>org.bremersee.swagger.authman.samba.configuration</configPackage>
+            <generateApiDocumentation>false</generateApiDocumentation>
+            <generateApiTests>false</generateApiTests>
+            <generateModelDocumentation>false</generateModelDocumentation>
+            <generateModelTests>false</generateModelTests>
+            <serializableModel>true</serializableModel>
+          </configOptions>
+          <environmentVariables>
+            <hideGenerationTimestamp />
+          </environmentVariables>
+          <output>${project.build.directory}/generated-sources</output>
+        </configuration>
+      </execution>
+      <execution>
+        <id>user-profile-listener-client</id>
+        <goals>
+          <goal>generate</goal>
+        </goals>
+        <configuration>
+          <templateDirectory>
+            ${project.basedir}/src/main/swagger-codegen/templates
+          </templateDirectory>
+          <inputSpec>${main.basedir}/src/swagger/user_profile_listener.yml</inputSpec>
+          <language>spring</language>
+          <library>spring-cloud</library>
+          <generateSupportingFiles>false</generateSupportingFiles>
+          <configOptions>
+            <useTags>true</useTags>
+            <dateLibrary>java8</dateLibrary>
+            <modelPackage>org.bremersee.swagger.authman.listener.model</modelPackage>
+            <apiPackage>org.bremersee.swagger.authman.listener.client</apiPackage>
+            <configPackage>org.bremersee.swagger.authman.listener.configuration</configPackage>
+            <generateApiDocumentation>false</generateApiDocumentation>
+            <generateApiTests>false</generateApiTests>
+            <generateModelDocumentation>false</generateModelDocumentation>
+            <generateModelTests>false</generateModelTests>
+            <serializableModel>true</serializableModel>
+          </configOptions>
+          <environmentVariables>
+            <hideGenerationTimestamp />
+          </environmentVariables>
+          <output>${project.build.directory}/generated-sources</output>
+        </configuration>
+      </execution>
         </executions>
       </plugin>
+      -->
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>

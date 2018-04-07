@@ -30,6 +30,7 @@ import org.bremersee.authman.domain.UserProfileRepository;
 import org.bremersee.authman.domain.UserRegistrationRequest;
 import org.bremersee.authman.domain.UserRegistrationRequestRepository;
 import org.bremersee.authman.exception.NotFoundException;
+import org.bremersee.authman.listener.UserProfileListener;
 import org.bremersee.authman.model.UserProfileCreateRequestDto;
 import org.bremersee.authman.model.UserProfileDto;
 import org.bremersee.authman.security.core.RoleConstants;
@@ -58,6 +59,8 @@ public class RegistrationServiceImpl extends AbstractUserProfileService
 
   private final UserProfileService userService;
 
+  private final UserProfileListener userProfileListener;
+
   private final PasswordEncoder passwordEncoder;
 
   private final JavaMailSender mailSender;
@@ -69,6 +72,7 @@ public class RegistrationServiceImpl extends AbstractUserProfileService
       final UserRegistrationRequestRepository registrationRepository,
       final UserProfileRepository userRepository,
       final UserProfileService userService,
+      final UserProfileListener userProfileListener,
       final PasswordEncoder passwordEncoder,
       final JavaMailSender mailSender) {
 
@@ -76,6 +80,7 @@ public class RegistrationServiceImpl extends AbstractUserProfileService
     this.registrationProperties = registrationProperties;
     this.registrationRepository = registrationRepository;
     this.userService = userService;
+    this.userProfileListener = userProfileListener;
     this.passwordEncoder = passwordEncoder;
     this.mailSender = mailSender;
   }
@@ -113,6 +118,8 @@ public class RegistrationServiceImpl extends AbstractUserProfileService
     sendRegistrationMail(entity);
 
     log.info("Registration successfully saved: {}", entity);
+
+    userProfileListener.onUserRegistrationRequest(request, entity.getRegistrationExpiration());
   }
 
   @Override

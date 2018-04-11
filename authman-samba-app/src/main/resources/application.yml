@@ -71,8 +71,8 @@ security:
       client-secret: secret4INTERNAL
     resource:
       jwt:
-        key-uri: http://localhost:8080/oauth/token_key
-      token-info-uri: http://localhost:8080/oauth/check_token
+        key-uri: ${OAUTH2_PUBLIC_KEY_URI:http://localhost:8080/oauth/token_key}
+      token-info-uri: ${OAUTH2_TOKEN_INFO_URI:http://localhost:8080/oauth/check_token}
       prefer-token-info: true
 
 spring:

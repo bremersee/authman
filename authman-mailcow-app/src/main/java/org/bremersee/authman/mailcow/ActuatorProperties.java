@@ -16,21 +16,27 @@
 
 package org.bremersee.authman.mailcow;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.bremersee.authman.security.core.SimpleUser;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Christian Bremer
  */
-@SpringBootApplication
-@EntityScan(basePackages = {"org.bremersee.authman.mailcow.domain"})
-@EnableJpaRepositories(basePackages = {"org.bremersee.authman.mailcow.domain"})
-public class MailcowConnectorApplication {
+@ConfigurationProperties(prefix = "bremersee.actuator")
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode
+@NoArgsConstructor
+public class ActuatorProperties {
 
-  public static void main(String[] args) {
-    SpringApplication.run(MailcowConnectorApplication.class, args);
-  }
+  private List<SimpleUser> users = new ArrayList<>();
 
 }

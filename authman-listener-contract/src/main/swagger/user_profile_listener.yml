@@ -18,7 +18,7 @@ schemes:
 - "http"
 - "https"
 paths:
-  /user-registration:
+  /api/event/user-registration:
     post:
       tags:
       - "user-profile-listener"
@@ -41,9 +41,8 @@ paths:
           description: "Invalid request"
       security:
       - bremersee_auth:
-        - "profile"
-        - "profile:write"
-  /user-profile:
+        - "profile:sync"
+  /api/event/user-profile:
     post:
       tags:
       - "user-profile-listener"
@@ -66,8 +65,7 @@ paths:
           description: "Invalid request"
       security:
       - bremersee_auth:
-        - "profile"
-        - "profile:write"
+        - "profile:sync"
     put:
       tags:
       - "user-profile-listener"
@@ -94,9 +92,8 @@ paths:
           description: "Validation exception"
       security:
       - bremersee_auth:
-        - "profile"
-        - "profile:write"
-  /user-profile/{userName}:
+        - "profile:sync"
+  /api/event/user-profile/{userName}:
     delete:
       tags:
       - "user-profile-listener"
@@ -118,9 +115,8 @@ paths:
           description: "User not found"
       security:
       - bremersee_auth:
-        - "profile"
-        - "profile:write"
-  /user-profile/{userName}/enabled:
+        - "profile:sync"
+  /api/event/user-profile/{userName}/enabled:
     put:
       tags:
       - "user-profile-listener"
@@ -150,9 +146,8 @@ paths:
           description: "User not found"
       security:
       - bremersee_auth:
-        - "profile"
-        - "profile:write"
-  /user-profile/{userName}/password:
+        - "profile:sync"
+  /api/event/user-profile/{userName}/password:
     put:
       tags:
       - "user-profile-listener"
@@ -182,9 +177,8 @@ paths:
           description: "User not found"
       security:
       - bremersee_auth:
-        - "profile"
-        - "profile:write"
-  /user-profile/{userName}/email:
+        - "profile:sync"
+  /api/event/user-profile/{userName}/email:
     put:
       tags:
       - "user-profile-listener"
@@ -214,9 +208,8 @@ paths:
           description: "User not found"
       security:
       - bremersee_auth:
-        - "profile"
-        - "profile:write"
-  /user-profile/{userName}/mobile:
+        - "profile:sync"
+  /api/event/user-profile/{userName}/mobile:
     put:
       tags:
       - "user-profile-listener"
@@ -246,8 +239,7 @@ paths:
           description: "User not found"
       security:
       - bremersee_auth:
-        - "profile"
-        - "profile:write"
+        - "profile:sync"
     delete:
       tags:
       - "user-profile-listener"
@@ -274,9 +266,8 @@ paths:
           description: "User not found"
       security:
       - bremersee_auth:
-        - "profile"
-        - "profile:write"
-  /user-profile/{userName}/roles:
+        - "profile:sync"
+  /api/event/user-profile/{userName}/roles:
     put:
       tags:
       - "user-profile-listener"
@@ -306,8 +297,7 @@ paths:
           description: "User not found"
       security:
       - bremersee_auth:
-        - "profile"
-        - "profile:write"
+        - "profile:sync"
 securityDefinitions:
   bremersee_auth:
     type: "oauth2"
@@ -315,7 +305,7 @@ securityDefinitions:
     flow: "implicit"
     scopes:
       profile: "Read your profile."
-      profile:write: "Write your profile."
+      profile:sync: "Write your profile."
 definitions:
   UserProfileRegistrationRequestEventDto:
     type: "object"

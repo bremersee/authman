@@ -57,6 +57,8 @@ public class AuthorizationServerProperties {
 
   private static final String PROFILE_WRITE_SCOPE = "profile:write";
 
+  private static final String PROFILE_SYNC_SCOPE = "profile:sync";
+
   private static final String SAMBA_ADMIN_SCOPE = "samba:admin";
 
   static {
@@ -113,6 +115,8 @@ public class AuthorizationServerProperties {
 
   private OAuth2ScopeDto profileWriteScope = new OAuth2ScopeDto();
 
+  private OAuth2ScopeDto profileSyncScope = new OAuth2ScopeDto();
+
   private OAuth2ScopeDto sambaAdminScope = new OAuth2ScopeDto();
 
   private List<OAuth2ScopeDto> otherScopes = new ArrayList<>();
@@ -120,6 +124,8 @@ public class AuthorizationServerProperties {
   private Set<String> defaultScopes = new LinkedHashSet<>();
 
   private OAuth2ClientDto internalClient = new OAuth2ClientDto();
+
+  private OAuth2ClientDto listenerClient = new OAuth2ClientDto();
 
   private OAuth2ClientDto sambaConnectorClient = new OAuth2ClientDto();
 
@@ -145,6 +151,12 @@ public class AuthorizationServerProperties {
     profileWriteScope.getDescriptions().put("en", "Write your user profile.");
     profileWriteScope.getDescriptions().put("de", "Dein Benutzerprofil schreiben.");
 
+    profileSyncScope.setScope(PROFILE_SYNC_SCOPE);
+    profileSyncScope.setVisibility(OAuth2ScopeVisibility.ADMIN);
+    profileSyncScope.setDefaultLanguage("en");
+    profileSyncScope.getDescriptions().put("en", "Synchronize an user profile.");
+    profileSyncScope.getDescriptions().put("de", "Ein Benutzerprofil synchronisieren.");
+
     sambaAdminScope.setScope(SAMBA_ADMIN_SCOPE);
     sambaAdminScope.setVisibility(OAuth2ScopeVisibility.ADMIN);
     sambaAdminScope.setDefaultLanguage("en");
@@ -152,6 +164,16 @@ public class AuthorizationServerProperties {
     sambaAdminScope.getDescriptions().put("de", "Samba AD administrieren.");
 
     defaultScopes.add(PROFILE_READ_SCOPE);
+
+    listenerClient.setDisplayName("Authman Listener Client");
+    listenerClient.setClientId("authman-listener-client");
+    listenerClient.setClientSecret(PasswordUtils
+        .createRandomClearPassword(64, false, false));
+    listenerClient.setClientSecretEncrypted(false);
+    listenerClient.getAuthorizedGrantTypes().add(CLIENT_CREDENTIALS);
+    listenerClient.getAuthorizedGrantTypes().add(PASSWORD_CREDENTIALS);
+    listenerClient.getScope().add(PROFILE_SYNC_SCOPE);
+    listenerClient.getAutoApproveScopes().add(Boolean.TRUE.toString());
 
     sambaConnectorClient.setDisplayName("Samba Connector Client");
     sambaConnectorClient.setClientId("smb-con-client");

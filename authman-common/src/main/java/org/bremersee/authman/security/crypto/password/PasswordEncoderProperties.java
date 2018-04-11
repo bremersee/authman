@@ -20,12 +20,10 @@ import java.io.Serializable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Christian Bremer
  */
-@Component("passwordEncoderProperties")
 @ConfigurationProperties(prefix = "bremersee.security.crypto.password-encoder")
 @Data
 @NoArgsConstructor

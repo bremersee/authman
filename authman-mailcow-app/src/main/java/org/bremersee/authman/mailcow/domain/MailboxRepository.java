@@ -16,6 +16,7 @@
 
 package org.bremersee.authman.mailcow.domain;
 
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -24,4 +25,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 //@RepositoryRestResource(collectionResourceRel = "mailbox", path = "/mailbox")
 public interface MailboxRepository extends JpaRepository<Mailbox, String> {
 
+  Optional<Mailbox> findByUserName(String userName);
 }

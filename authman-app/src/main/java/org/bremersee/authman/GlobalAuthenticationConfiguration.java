@@ -21,8 +21,10 @@ import org.bremersee.authman.domain.RoleRepository;
 import org.bremersee.authman.domain.UserProfileRepository;
 import org.bremersee.authman.domain.UserRegistrationRequestRepository;
 import org.bremersee.authman.security.authentication.OAuth2AuthenticationProvider;
-import org.bremersee.authman.security.crypto.password.PasswordEncoder;
+import org.bremersee.authman.security.crypto.password.PasswordEncoderImpl;
+import org.bremersee.authman.security.crypto.password.PasswordEncoderProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -33,6 +35,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  * @author Christian Bremer
  */
 @Configuration
+@EnableConfigurationProperties({PasswordEncoderProperties.class})
 public class GlobalAuthenticationConfiguration extends GlobalAuthenticationConfigurerAdapter {
 
   private final UserProfileRepository userProfileRepository;
@@ -45,29 +48,35 @@ public class GlobalAuthenticationConfiguration extends GlobalAuthenticationConfi
 
   private final OAuth2ForeignTokenRepository oauth2TokenRepository;
 
-  private final PasswordEncoder passwordEncoder;
+  private final PasswordEncoderImpl passwordEncoder;
 
   @Autowired
   public GlobalAuthenticationConfiguration(
+      final PasswordEncoderProperties passwordEncoderProperties,
       final UserProfileRepository userProfileRepository,
       final UserRegistrationRequestRepository userRegistrationRequestRepository,
       final RoleRepository roleRepository,
       final UserDetailsService userDetailsService,
-      final OAuth2ForeignTokenRepository oauth2TokenRepository,
-      final PasswordEncoder passwordEncoder) {
+      final OAuth2ForeignTokenRepository oauth2TokenRepository) {
 
     this.userProfileRepository = userProfileRepository;
     this.userRegistrationRequestRepository = userRegistrationRequestRepository;
     this.roleRepository = roleRepository;
     this.userDetailsService = userDetailsService;
     this.oauth2TokenRepository = oauth2TokenRepository;
-    this.passwordEncoder = passwordEncoder;
+    this.passwordEncoder = new PasswordEncoderImpl(passwordEncoderProperties);
+    this.passwordEncoder.init();
   }
 
   @Override
   public void init(AuthenticationManagerBuilder auth) throws Exception {
     auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     auth.authenticationProvider(oAuth2AuthenticationProvider());
+  }
+
+  @Bean(name = "passwordEncoder")
+  public PasswordEncoderImpl passwordEncoder() {
+    return passwordEncoder;
   }
 
   @Bean("oAuth2AuthenticationProviderAndImporter")

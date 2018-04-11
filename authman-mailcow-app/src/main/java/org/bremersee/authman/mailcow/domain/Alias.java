@@ -28,11 +28,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.Type;
 
 /**
  * @author Christian Bremer
@@ -62,7 +64,8 @@ public class Alias implements Serializable {
   private String address;
 
   @JsonProperty(value = "goTo", required = true)
-  @Column(name = "goto", nullable = false, length = 64000)
+  @Column(name = "goto", nullable = false)
+  @Type(type = "text")
   private String goTo;
 
   @JsonProperty(value = "domain", required = true)

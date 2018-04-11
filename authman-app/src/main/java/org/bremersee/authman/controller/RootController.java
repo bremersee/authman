@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package org.bremersee.authman.mailcow;
+package org.bremersee.authman.controller;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  * @author Christian Bremer
  */
-@SpringBootApplication
-@EntityScan(basePackages = {"org.bremersee.authman.mailcow.domain"})
-@EnableJpaRepositories(basePackages = {"org.bremersee.authman.mailcow.domain"})
-public class MailcowConnectorApplication {
+@Controller
+public class RootController {
 
-  public static void main(String[] args) {
-    SpringApplication.run(MailcowConnectorApplication.class, args);
+  @GetMapping(path = "/")
+  public String displayRoot() {
+    return "redirect/:profile";
   }
 
 }

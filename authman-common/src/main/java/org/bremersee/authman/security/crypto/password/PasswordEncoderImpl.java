@@ -24,7 +24,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Provider;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
-import javax.annotation.PostConstruct;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -38,13 +37,10 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * @author Christian Bremer
  */
-@Component("passwordEncoder")
 @Slf4j
 public class PasswordEncoderImpl implements PasswordEncoder {
 
@@ -78,14 +74,12 @@ public class PasswordEncoderImpl implements PasswordEncoder {
    *
    * @param properties the password encoder properties
    */
-  @Autowired
   public PasswordEncoderImpl(final PasswordEncoderProperties properties) {
     setRandomSaltLength(properties.getRandomSaltLength());
     setAlgorithm(properties.getAlgorithm());
     setStoreNoEncryptionFlag(properties.isStoreNoEncryptionFlag());
   }
 
-  @PostConstruct
   public void init() {
     log.info("Initializing " + getClass().getSimpleName() + " ...");
     if (bouncyCastleProvider == null) {

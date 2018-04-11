@@ -5,6 +5,10 @@ bremersee:
         password: secret4ACTUATOR
         authorities:
           - ROLE_ACTUATOR
+  security:
+    crypto:
+      password-encoder:
+        random-salt-length: 16
 
 eureka:
   client:
@@ -44,11 +48,24 @@ security:
       client-secret: secret4INTERNAL
     resource:
       jwt:
-        key-uri: http://localhost:8080/oauth/token_key
-      token-info-uri: http://localhost:8080/oauth/check_token
+        key-uri: ${OAUTH2_PUBLIC_KEY_URI:http://localhost:8080/oauth/token_key}
+      token-info-uri: ${OAUTH2_TOKEN_INFO_URI:http://localhost:8080/oauth/check_token}
       prefer-token-info: true
 
 spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+  jpa:
+    database: h2
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: true
+  h2:
+    console:
+      enabled: true
+      settings:
+        trace: false
+        web-allow-others: false
   jackson:
     date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
     default-property-inclusion: non_null
@@ -63,3 +80,35 @@ spring:
   zipkin:
     enabled: false
     base-url: http://localhost:9411/
+
+---
+
+spring:
+  profiles: mysql
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:mailcow}?useServerPrepStmts=true&useTimezone=true&useLegacyDatetimeCode=false&serverTimezone=UTC&sendFractionalSeconds=true
+    username: ${MYSQL_USER:mailcow}
+    password: ${MYSQL_PASSWORD:mailcow}
+    platform: mysql
+    # HikariCP is the new default connection pool,
+    # see: https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-sql.html
+    # see: https://github.com/brettwooldridge/HikariCP
+    #
+    hikari:
+      pool-name: mailcow
+      # If your driver supports JDBC4 we strongly recommend not setting this property.
+      # connectionTestQuery: SELECT 1
+    # Tomcat pooling DataSource is no longer the default one,
+    # see: https://docs.spring.io/spring-boot/docs/current/reference/html/boot-features-sql.html
+    # and: https://tomcat.apache.org/tomcat-8.0-doc/jdbc-pool.html#Common_Attributes
+    # Setting test-on-borrow = true is important because connections in the pool can expire and then no longer work.
+    # tomcat:
+    #   test-on-borrow: true
+    #   validation-query: SELECT 1
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect

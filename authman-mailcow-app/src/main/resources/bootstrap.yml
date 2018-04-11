@@ -1,6 +1,8 @@
 spring:
   application:
-    name: mailcow-con
+    name: mailcow-connector
+  profiles:
+    active: ${ACTIVE_PROFILES:default}
   cloud:
     config:
       enabled: ${CONFIG_CLIENT_ENABLED:false}

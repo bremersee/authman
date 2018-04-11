@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "bremersee.domain",
+      "type": "java.lang.String",
+      "description": "The domain name of the mail server (e. g. example.org)."
+    }
+  ]
+}

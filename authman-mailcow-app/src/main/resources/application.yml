@@ -1,5 +1,9 @@
 bremersee:
-  actuator:
+  access:
+    authorities:
+      - ROLE_ACTUATOR
+    ip-addresses:
+      - 127.0.0.1
     users:
       - name: actuator
         password: secret4ACTUATOR
@@ -20,6 +24,7 @@ eureka:
   instance:
     health-check-url-path: /actuator/health
     home-page-url-path: /actuator/info
+    lease-renewal-interval-in-seconds: 10
 
 logging:
   level:
@@ -32,7 +37,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,env
+        include: "*"
 
 server:
   port: ${SERVER_PORT:8091}

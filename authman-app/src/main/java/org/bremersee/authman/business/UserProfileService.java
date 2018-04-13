@@ -16,6 +16,7 @@
 
 package org.bremersee.authman.business;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import org.bremersee.authman.model.UserProfileCreateRequestDto;
 import org.bremersee.authman.model.UserProfileDto;
@@ -47,7 +48,12 @@ public interface UserProfileService {
 
   boolean isPasswordPresent(@NotNull String userName);
 
-  void changePassword(@NotNull String userName, String oldPassword, @NotNull String newPassword);
+  UserProfileDto resetPassword(@NotNull String userName, @NotBlank String newPassword);
+
+  UserProfileDto changePassword(
+      @NotNull String userName,
+      String oldPassword, @NotBlank
+      String newPassword);
 
 
   void changeEmail(@NotNull String userName, @NotNull String email);

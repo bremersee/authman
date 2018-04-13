@@ -27,7 +27,7 @@ public class RootController {
 
   @GetMapping(path = "/")
   public String displayRoot() {
-    return "redirect/:profile";
+    return "redirect:/profile";
   }
 
 }

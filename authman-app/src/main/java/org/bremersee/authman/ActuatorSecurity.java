@@ -16,8 +16,10 @@
 
 package org.bremersee.authman;
 
-import org.bremersee.authman.security.core.RoleConstants;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
@@ -27,9 +29,18 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 /**
  * @author Christian Bremer
  */
-@Configuration
 @Order(101)
+@Configuration
+@EnableConfigurationProperties(AccessProperties.class)
+@Slf4j
 public class ActuatorSecurity extends WebSecurityConfigurerAdapter {
+
+  private final AccessProperties properties;
+
+  @Autowired
+  public ActuatorSecurity(AccessProperties properties) {
+    this.properties = properties;
+  }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
@@ -42,7 +53,7 @@ public class ActuatorSecurity extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .antMatchers(HttpMethod.GET, "/actuator/health").permitAll()
         .anyRequest()
-        .hasAuthority(RoleConstants.ACTUATOR_ROLE);
+        .access(properties.buildAccess());
   }
 
 }

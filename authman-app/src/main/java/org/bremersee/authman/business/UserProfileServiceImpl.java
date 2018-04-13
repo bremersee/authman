@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.authman.domain.UserProfile;
@@ -273,10 +274,18 @@ public class UserProfileServiceImpl extends AbstractUserProfileService
 
   @PreAuthorize("hasRole('ROLE_ADMIN') or authentication.name == #userName")
   @Override
-  public void changePassword(
+  public UserProfileDto resetPassword(
+      @NotNull final String userName,
+      @NotBlank final String newPassword) {
+    return changePassword(userName, null, newPassword);
+  }
+
+  @PreAuthorize("hasRole('ROLE_ADMIN') or authentication.name == #userName")
+  @Override
+  public UserProfileDto changePassword(
       @NotNull final String userName,
       final String oldPassword,
-      @NotNull final String newPassword) {
+      @NotBlank final String newPassword) {
 
     UserProfile userProfile = getUserRepository()
         .findByLogin(userName)
@@ -293,9 +302,10 @@ public class UserProfileServiceImpl extends AbstractUserProfileService
     }
 
     userProfile.setPassword(passwordEncoder.encode(newPassword));
-    getUserRepository().save(userProfile);
+    userProfile = getUserRepository().save(userProfile);
     sambaConnectorService.updateUserPasswordAsync(userName, newPassword);
     userProfileListener.onNewPassword(userName, newPassword);
+    return userMapper.mapToDto(userProfile);
   }
 
   @PreAuthorize("hasRole('ROLE_ADMIN') or authentication.name == #userName")

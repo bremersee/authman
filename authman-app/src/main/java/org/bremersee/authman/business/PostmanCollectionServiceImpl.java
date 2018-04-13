@@ -22,6 +22,7 @@ import static org.bremersee.authman.AuthorizationServerProperties.IMPLICIT;
 import static org.bremersee.authman.AuthorizationServerProperties.PASSWORD_CREDENTIALS;
 import static org.bremersee.authman.AuthorizationServerProperties.REFRESH_TOKEN;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -120,6 +121,17 @@ public class PostmanCollectionServiceImpl implements PostmanCollectionService {
     this.passwordEncoder = new PasswordEncoderImpl(pep);
   }
 
+  public Collection emptyCollection(
+      @NotNull String clientId,
+      @NotNull String scheme,
+      @NotNull String host,
+      int port) {
+
+    log.info("Generation EMPTY postman collection of client [{}].", clientId);
+    return new Collection();
+  }
+
+  @HystrixCommand(fallbackMethod = "emptyCollection")
   @Override
   public Collection generatePostmanCollection(
       @NotNull String clientId,
@@ -457,6 +469,9 @@ public class PostmanCollectionServiceImpl implements PostmanCollectionService {
     List<String> list = new ArrayList<>();
     if (paths != null && paths.length > 0) {
       for (String p : paths) {
+        while (p.startsWith("/")) {
+          p = p.substring(1);
+        }
         String[] tmp = StringUtils.delimitedListToStringArray(p, "/");
         for (String path : tmp) {
           if (StringUtils.hasText(path)) {

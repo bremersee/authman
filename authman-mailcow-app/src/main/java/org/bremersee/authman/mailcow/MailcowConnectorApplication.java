@@ -19,6 +19,7 @@ package org.bremersee.authman.mailcow;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.cloud.netflix.hystrix.EnableHystrix;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
@@ -27,6 +28,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @SpringBootApplication
 @EntityScan(basePackages = {"org.bremersee.authman.mailcow.domain"})
 @EnableJpaRepositories(basePackages = {"org.bremersee.authman.mailcow.domain"})
+@EnableHystrix
 public class MailcowConnectorApplication {
 
   public static void main(String[] args) {

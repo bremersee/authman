@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.bremersee.authman.mailcow;
+package org.bremersee.authman;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,20 +23,46 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.bremersee.authman.security.core.SimpleUser;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Christian Bremer
  */
-@ConfigurationProperties(prefix = "bremersee.actuator")
+@ConfigurationProperties(prefix = "bremersee.access")
 @Getter
 @Setter
 @ToString
 @EqualsAndHashCode
 @NoArgsConstructor
-public class ActuatorProperties {
+@Slf4j
+public class AccessProperties {
 
   private List<SimpleUser> users = new ArrayList<>();
+
+  private List<String> authorities = new ArrayList<>();
+
+  private List<String> ipAddresses = new ArrayList<>();
+
+  private String defaultAccess = "hasIpAddress('127.0.0.1') "
+      + "or hasIpAddress('::1') "
+      + "or isAuthenticated()";
+
+  public String buildAccess() {
+    if (authorities.isEmpty() && ipAddresses.isEmpty()) {
+      log.info("Actuator access = {}", defaultAccess);
+      return defaultAccess;
+    }
+    final String or = " or ";
+    final StringBuilder sb = new StringBuilder();
+    authorities.forEach(
+        authority -> sb.append("hasAuthority('").append(authority).append("')").append(or));
+    ipAddresses.forEach(
+        ipAddress -> sb.append("hasIpAddress('").append(ipAddress).append("')").append(or));
+    final String access = sb.substring(0, sb.length() - or.length());
+    log.info("Actuator access = {}", access);
+    return access;
+  }
 
 }

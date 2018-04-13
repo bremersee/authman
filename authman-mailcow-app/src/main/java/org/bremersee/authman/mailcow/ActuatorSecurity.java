@@ -17,7 +17,7 @@
 package org.bremersee.authman.mailcow;
 
 import lombok.extern.slf4j.Slf4j;
-import org.bremersee.authman.security.core.RoleConstants;
+import org.bremersee.authman.AccessProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -40,14 +40,14 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
  */
 @Order(101)
 @Configuration
-@EnableConfigurationProperties(ActuatorProperties.class)
+@EnableConfigurationProperties(AccessProperties.class)
 @Slf4j
 public class ActuatorSecurity extends WebSecurityConfigurerAdapter {
 
-  private final ActuatorProperties properties;
+  private final AccessProperties properties;
 
   @Autowired
-  public ActuatorSecurity(ActuatorProperties properties) {
+  public ActuatorSecurity(AccessProperties properties) {
     this.properties = properties;
   }
 
@@ -69,7 +69,7 @@ public class ActuatorSecurity extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.GET, "/actuator/health").permitAll()
         .antMatchers(HttpMethod.GET, "/actuator/info").permitAll()
         .anyRequest()
-        .hasAuthority(RoleConstants.ACTUATOR_ROLE);
+        .access(properties.buildAccess());
   }
 
   @Bean

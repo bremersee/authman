@@ -17,12 +17,13 @@
 package org.bremersee.authman.listener;
 
 import feign.Client;
-import feign.Feign;
+import feign.Request;
 import feign.Retryer;
 import feign.Retryer.Default;
 import feign.Target;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
+import feign.hystrix.HystrixFeign;
 import org.bremersee.authman.domain.OAuth2ClientRepository;
 import org.bremersee.authman.security.oauth2.client.OAuth2CredentialsClient;
 import org.bremersee.authman.security.oauth2.client.OAuth2FeignRequestInterceptor;
@@ -117,13 +118,18 @@ public class UserProfileListenerConfiguration {
       throw new IllegalArgumentException("Feign name and/or url must be present.");
     }
 
-    return Feign.builder()
+    // A feign builder without hystrix: Feign.builder()
+    return HystrixFeign
+        .builder()
         .client(client)
+        .options(new Request.Options(
+            properties.getConnectTimeoutMillis(),
+            properties.getReadTimeoutMillis()))
         .decoder(decoder)
         .encoder(encoder)
         .logLevel(properties.getFeignLogLevel())
         .requestInterceptor(new OAuth2FeignRequestInterceptor(tokenProvider))
         .retryer(retryer)
-        .target(target);
+        .target(target, new UserProfileListenerFallback());
   }
 }

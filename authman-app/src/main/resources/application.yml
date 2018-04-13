@@ -1,4 +1,11 @@
+
+
 bremersee:
+  access:
+    authorities:
+      - ROLE_ACTUATOR
+    ip-addresses:
+      - 127.0.0.1
   authorization-server:
     allow-form-authentication-for-clients: false
     check-token-access: isAuthenticated()
@@ -172,6 +179,17 @@ feign:
         connect-timeout: 5000
         read-timeout: 5000
 
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: true
+    prefer-same-zone-eureka: true
+    service-url:
+      defaultZone: http://eureka:8761/eureka/
+  instance:
+    health-check-url-path: /actuator/health
+    home-page-url-path: /actuator/info
+
 logging:
   level:
     ROOT: info
@@ -182,7 +200,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,env
+        include: "*"
 
 server:
   port: ${SERVER_PORT:8080}

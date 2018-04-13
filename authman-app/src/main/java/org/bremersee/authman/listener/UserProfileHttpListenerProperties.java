@@ -42,6 +42,10 @@ public class UserProfileHttpListenerProperties implements Serializable {
 
   private Level feignLogLevel = Level.BASIC;
 
+  private int connectTimeoutMillis = 10 * 1000;
+
+  private int readTimeoutMillis = 60 * 1000;
+
   private long retryPeriod = 3000;
 
   private long retryMaxPeriod = 120000;

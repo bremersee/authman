@@ -24,7 +24,8 @@ import org.springframework.cloud.openfeign.FeignClient;
  */
 @FeignClient(name = "${bremersee.samba-connector.name:smb-con}",
     url = "${bremersee.samba-connector.url:}",
-    configuration = {SambaConnectorConfiguration.class})
+    configuration = {SambaConnectorConfiguration.class},
+    fallback = SambaConnectorFallback.class)
 public interface SambaConnectorClient extends SambaConnectorControllerApi {
 
 }

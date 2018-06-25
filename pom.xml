@@ -25,6 +25,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dependency.locations.enabled>false</dependency.locations.enabled>
     <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
+    <dockerfile.skip>true</dockerfile.skip>
     <java.version>1.8</java.version>
 
     <spring-cloud.version>Finchley.M9</spring-cloud.version>

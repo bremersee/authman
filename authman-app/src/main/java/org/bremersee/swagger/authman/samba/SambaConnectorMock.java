@@ -18,12 +18,27 @@ package org.bremersee.swagger.authman.samba;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.swagger.authman.samba.api.SambaConnectorControllerApi;
 import org.bremersee.swagger.authman.samba.model.BooleanWrapper;
+import org.bremersee.swagger.authman.samba.model.DnsDwDpZoneFlag;
+import org.bremersee.swagger.authman.samba.model.DnsEntry;
+import org.bremersee.swagger.authman.samba.model.DnsRecord;
+import org.bremersee.swagger.authman.samba.model.DnsRecordRequest;
+import org.bremersee.swagger.authman.samba.model.DnsRecordType;
+import org.bremersee.swagger.authman.samba.model.DnsRecordUpdateRequest;
+import org.bremersee.swagger.authman.samba.model.DnsZone;
+import org.bremersee.swagger.authman.samba.model.DnsZoneCreateRequest;
+import org.bremersee.swagger.authman.samba.model.DnsZoneFlag;
+import org.bremersee.swagger.authman.samba.model.Info;
 import org.bremersee.swagger.authman.samba.model.Names;
 import org.bremersee.swagger.authman.samba.model.Password;
 import org.bremersee.swagger.authman.samba.model.SambaGroup;
@@ -31,12 +46,121 @@ import org.bremersee.swagger.authman.samba.model.SambaGroupItem;
 import org.bremersee.swagger.authman.samba.model.SambaUser;
 import org.bremersee.swagger.authman.samba.model.SambaUserAddRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Christian Bremer
  */
 @Slf4j
 public class SambaConnectorMock implements SambaConnectorControllerApi {
+
+  private static final String ZONE_MSDCS = "_msdcs.eixe.bremersee.org";
+
+  private static final String ZONE_MY = "eixe.bremersee.org";
+
+  private static final String ZONE_MY_REVERSE = "1.168.192.in-addr.arpa";
+
+  private final Map<DnsZone, List<DnsEntry>> ns = new ConcurrentHashMap<>();
+
+  public SambaConnectorMock() {
+    createDnsZones().forEach(dnsZone -> ns.put(dnsZone, new ArrayList<>()));
+
+    createOrDeleteDnsRecord(
+        "CREATE", // NOSONAR
+        new DnsRecordRequest()
+            .zoneName(ZONE_MSDCS)
+            .name("").recordType(DnsRecordType.SOA)
+            .data("serial=1, refresh=900, retry=600, expire=86400, minttl=3600, "
+                + "ns=dc.eixe.bremersee.org., email=hostmaster.eixe.bremersee.org."));
+    createOrDeleteDnsRecord(
+        "CREATE", // NOSONAR
+        new DnsRecordRequest()
+            .zoneName(ZONE_MSDCS)
+            .name("").recordType(DnsRecordType.NS)
+            .data("dc.eixe.bremersee.org."));
+
+    createOrDeleteDnsRecord(
+        "CREATE", // NOSONAR
+        new DnsRecordRequest()
+            .zoneName(ZONE_MY)
+            .name("vmhost").recordType(DnsRecordType.A)
+            .data("192.168.1.7")); // NOSONAR
+    createOrDeleteDnsRecord(
+        "CREATE",
+        new DnsRecordRequest()
+            .zoneName(ZONE_MY_REVERSE)
+            .name("7").recordType(DnsRecordType.PTR)
+            .data("vmhost.eixe.bremersee.org")); // NOSONAR
+
+    createOrDeleteDnsRecord(
+        "CREATE", // NOSONAR
+        new DnsRecordRequest()
+            .zoneName(ZONE_MY)
+            .name("zander").recordType(DnsRecordType.A)
+            .data("192.168.1.200")); // NOSONAR
+    createOrDeleteDnsRecord(
+        "CREATE",
+        new DnsRecordRequest()
+            .zoneName(ZONE_MY_REVERSE)
+            .name("200").recordType(DnsRecordType.PTR)
+            .data("zander.eixe.bremersee.org")); // NOSONAR
+  }
+
+  private List<DnsZone> createDnsZones() {
+    final List<DnsZone> zones = new ArrayList<>();
+    zones.add(createDnsZone(ZONE_MY_REVERSE));
+    zones.add(createDnsZone(ZONE_MY));
+    zones.add(createDnsZone(ZONE_MSDCS));
+    return zones;
+  }
+
+  private DnsZone createDnsZone(@NotNull final String name) {
+    return createDnsZone(
+        name, null, null, null, null, null);
+  }
+
+  @SuppressWarnings("SameParameterValue")
+  private DnsZone createDnsZone(
+      @NotNull final String name,
+      final String[] flags,
+      final String zoneType,
+      final String version,
+      final String[] dwDpFlags,
+      final String pszDpFqdn) {
+
+    final DnsZone zone = new DnsZone();
+    zone.setPszZoneName(name);
+    if (flags != null && flags.length > 0) {
+      zone.setFlags(
+          Arrays.stream(flags).map(this::createDnsZoneFlag).collect(Collectors.toList()));
+    } else {
+      zone.addFlagsItem(new DnsZoneFlag().name("DNS_RPC_ZONE_DSINTEGRATED"));
+      zone.addFlagsItem(new DnsZoneFlag().name("DNS_RPC_ZONE_UPDATE_SECURE"));
+    }
+    zone.setZoneType(StringUtils.hasText(zoneType) ? zoneType : "DNS_ZONE_TYPE_PRIMARY");
+    zone.setVersion(StringUtils.hasText(version) ? version : "50");
+    if (dwDpFlags != null && dwDpFlags.length > 0) {
+      zone.setDwDpFlags(
+          Arrays.stream(dwDpFlags).map(this::createDnsDwDpZoneFlag).collect(Collectors.toList()));
+    } else {
+      zone.addDwDpFlagsItem(new DnsDwDpZoneFlag().name("DNS_DP_AUTOCREATED"));
+      zone.addDwDpFlagsItem(new DnsDwDpZoneFlag().name("DNS_DP_DOMAIN_DEFAULT"));
+      zone.addDwDpFlagsItem(new DnsDwDpZoneFlag().name("DNS_DP_ENLISTED"));
+    }
+    final String defaultPsz = name.startsWith("_msdcs")
+        ? "ForestDnsZones.eixe.bremersee.org"
+        : "DomainDnsZones.eixe.bremersee.org";
+    zone.setPszDpFqdn(StringUtils.hasText(pszDpFqdn) ? pszDpFqdn : defaultPsz);
+    return zone;
+  }
+
+  private DnsZoneFlag createDnsZoneFlag(String name) {
+    return new DnsZoneFlag().name(name);
+  }
+
+  private DnsDwDpZoneFlag createDnsDwDpZoneFlag(String name) {
+    return new DnsDwDpZoneFlag().name(name);
+  }
 
   SambaGroup createGroup(String name) {
     final SambaGroup group = new SambaGroup();
@@ -75,6 +199,67 @@ public class SambaConnectorMock implements SambaConnectorControllerApi {
   }
 
   @Override
+  public ResponseEntity<Void> createDnsZone(@Valid final DnsZoneCreateRequest request) {
+    log.info("Samba connector MOCK is creating name server zone {}", request);
+    final String name = request.getPszZoneName();
+    final DnsZone zone = createDnsZone(name);
+    ns.computeIfAbsent(zone, k -> new ArrayList<>());
+    return ResponseEntity.ok().build();
+  }
+
+  @Override
+  public ResponseEntity<Void> createOrDeleteDnsRecord( // NOSONAR
+      @NotNull @Valid final String action,
+      @Valid final DnsRecordRequest request) {
+    log.info("Samba connector MOCK is executing '{}' with {}", action, request);
+    final List<DnsEntry> entries = ns.get(createDnsZone(request.getZoneName()));
+    if (entries != null) {
+      if ("DELETE".equals(action)) {
+        entries.forEach(dnsEntry -> {
+          if (dnsEntry.getRecords() != null
+              && String.valueOf(dnsEntry.getName()).equals(request.getName())) {
+            dnsEntry.getRecords().removeIf(
+                dnsRecord -> String.valueOf(dnsRecord.getRecordValue()).equals(request.getData())
+                    && String.valueOf(request.getRecordType()).equals(dnsRecord.getRecordType()));
+          }
+        });
+        entries.removeIf(
+            dnsEntry -> dnsEntry.getRecords() == null || dnsEntry.getRecords().isEmpty());
+      } else if ("CREATE".equals(action)) {
+        final DnsRecord record = new DnsRecord()
+            .recordType(String.valueOf(request.getRecordType()))
+            .recordValue(request.getData())
+            .flags("f0")
+            .serial("2417")
+            .ttl("3600");
+        boolean added = false;
+        for (DnsEntry dnsEntry : entries) {
+          if (String.valueOf(dnsEntry.getName()).equals(request.getName())) {
+            dnsEntry.addRecordsItem(record);
+            added = true;
+            break;
+          }
+        }
+        if (!added) {
+          entries.add(new DnsEntry()
+              .name(request.getName())
+              .addRecordsItem(record));
+        }
+      } else {
+        log.warn("Action {} is not supported. Doing nothing.");
+      }
+    }
+    return ResponseEntity.ok().build();
+  }
+
+  @Override
+  public ResponseEntity<Void> deleteDnsZone(@NotNull @Valid final String zoneName) {
+    log.info("Samba connector MOCK is deleting name server zone {}", zoneName);
+    ns.remove(createDnsZone(zoneName));
+    return ResponseEntity.ok().build();
+  }
+
+  @Override
   public ResponseEntity<Void> deleteGroup(String groupName) {
     log.info("Samba connector MOCK is deleting samba group {}", groupName);
     return ResponseEntity.ok().build();
@@ -84,6 +269,21 @@ public class SambaConnectorMock implements SambaConnectorControllerApi {
   public ResponseEntity<Void> deleteUser(String userName) {
     log.info("Samba connector MOCK is deleting samba user {}", userName);
     return ResponseEntity.ok().build();
+  }
+
+  @Override
+  public ResponseEntity<List<DnsZone>> getDnsZones() {
+    log.info("Samba connector MOCK is getting name server zones.");
+    return ResponseEntity.ok(new ArrayList<>(ns.keySet()));
+  }
+
+  @Override
+  public ResponseEntity<List<DnsEntry>> getDnsRecords(@NotNull @Valid String zoneName) {
+    log.info("Samba connector MOCK is getting name server records of zone {}", zoneName);
+    final List<DnsEntry> entries = ns.get(createDnsZone(zoneName));
+    log.debug("Samba connector MOCK is getting name server records of zone {}: {}", zoneName,
+        entries);
+    return ResponseEntity.ok(entries == null ? new ArrayList<>() : new ArrayList<>(entries));
   }
 
   @Override
@@ -98,6 +298,13 @@ public class SambaConnectorMock implements SambaConnectorControllerApi {
     return ResponseEntity.ok(Collections.singletonList(createGroup("Administrators")));
   }
 
+  @Override
+  public ResponseEntity<Info> getInfo() {
+    return ResponseEntity.ok(
+        new Info()
+            .nameServerHost("ns.example.org"));
+  }
+
   public ResponseEntity<BooleanWrapper> userExists(String userName) {
     log.info("Samba connector MOCK is getting samba user {} exists?", userName);
     final BooleanWrapper wrapper = new BooleanWrapper();
@@ -109,6 +316,26 @@ public class SambaConnectorMock implements SambaConnectorControllerApi {
   public ResponseEntity<SambaUser> getUser(String userName) {
     log.info("Samba connector MOCK is getting samba user {}", userName);
     return ResponseEntity.ok(createUser(userName));
+  }
+
+  @Override
+  public ResponseEntity<Void> updateDnsRecord(@Valid DnsRecordUpdateRequest request) {
+    log.info("Samba connector MOCK updates dns record {}", request);
+    final List<DnsEntry> entries = ns.get(createDnsZone(request.getZoneName()));
+    if (entries != null) {
+      entries.forEach(dnsEntry -> {
+        if (dnsEntry.getRecords() != null
+            && String.valueOf(dnsEntry.getName()).equals(request.getName())) {
+          dnsEntry.getRecords().forEach(dnsRecord -> {
+            if (String.valueOf(request.getRecordType()).equals(dnsRecord.getRecordType())
+                && String.valueOf(request.getOldData()).equals(dnsRecord.getRecordValue())) {
+              dnsRecord.setRecordValue(request.getNewData());
+            }
+          });
+        }
+      });
+    }
+    return ResponseEntity.ok().build();
   }
 
   @Override

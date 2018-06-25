@@ -114,6 +114,12 @@
              th:text="#{i18n.user.add}">
             Add User
           </a>
+          <div class="dropdown-divider"></div>
+          <a id="nameserver" class="dropdown-item" href="#"
+             th:href="@{/admin/ns/records}"
+             th:text="#{i18n.ns}">
+            Name Server
+          </a>
         </div>
       </li>
     </ul>

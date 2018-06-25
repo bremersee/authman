@@ -19,6 +19,9 @@ package org.bremersee.authman.samba.business;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import org.bremersee.swagger.authman.samba.model.DnsEntry;
+import org.bremersee.swagger.authman.samba.model.DnsRecordType;
+import org.bremersee.swagger.authman.samba.model.DnsZone;
 import org.bremersee.swagger.authman.samba.model.Names;
 import org.bremersee.swagger.authman.samba.model.Password;
 import org.bremersee.swagger.authman.samba.model.SambaGroup;
@@ -55,5 +58,33 @@ public interface SambaConnectorService {
   void updateUserPassword(@NotNull String userName, @Valid Password newPassword);
 
   void deleteUser(@NotNull String userName);
+
+
+  List<DnsZone> getDnsZones();
+
+  void createDnsZone(@NotNull String zoneName);
+
+  void deleteDnsZone(@NotNull String zoneName);
+
+  List<DnsEntry> getDnsRecords(@NotNull String zoneName);
+
+  void addDnsRecord(
+      @NotNull String zoneName,
+      @NotNull String name,
+      @NotNull DnsRecordType recordType,
+      @NotNull String data);
+
+  void updateDnsRecord(
+      @NotNull String zoneName,
+      @NotNull String name,
+      @NotNull DnsRecordType recordType,
+      @NotNull String oldData,
+      @NotNull String newData);
+
+  void deleteDnsRecord(
+      @NotNull String zoneName,
+      @NotNull String name,
+      @NotNull DnsRecordType recordType,
+      @NotNull String data);
 
 }

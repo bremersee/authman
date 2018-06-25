@@ -237,6 +237,7 @@
           </execution>
         </executions>
         <configuration>
+          <skip>${dockerfile.skip}</skip>
           <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
           <repository>docker.io/bremersee/mailcow-connector</repository>
           <tag>latest</tag>

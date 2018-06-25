@@ -30,7 +30,6 @@ import org.bremersee.authman.security.authentication.github.GitHubUserProfilePar
 import org.bremersee.authman.security.authentication.google.GoogleAuthenticationProperties;
 import org.bremersee.authman.security.authentication.google.GoogleUserProfileParser;
 import org.bremersee.authman.security.core.RoleConstants;
-import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -192,12 +191,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .addFilterAfter(gitHubCallbackFilter(), AbstractPreAuthenticatedProcessingFilter.class)
         .addFilterAfter(oAuth2MergeFilter(), AbstractPreAuthenticatedProcessingFilter.class)
 
-
         .requestMatcher(new NegatedRequestMatcher(
             new OrRequestMatcher(
                 new AntPathRequestMatcher("/api/**"),
                 new AntPathRequestMatcher("/actuator/**"))))
-
 
         .authorizeRequests()
         .antMatchers(HttpMethod.GET, "/merge*").permitAll()

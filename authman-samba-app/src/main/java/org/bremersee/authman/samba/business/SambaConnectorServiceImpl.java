@@ -37,6 +37,9 @@ import org.bremersee.authman.samba.SambaDomainProperties;
 import org.bremersee.authman.samba.exception.AlreadyExistsException;
 import org.bremersee.authman.samba.exception.LdapRuntimeException;
 import org.bremersee.authman.samba.exception.NotFoundException;
+import org.bremersee.swagger.authman.samba.model.DnsEntry;
+import org.bremersee.swagger.authman.samba.model.DnsRecordType;
+import org.bremersee.swagger.authman.samba.model.DnsZone;
 import org.bremersee.swagger.authman.samba.model.Name;
 import org.bremersee.swagger.authman.samba.model.Names;
 import org.bremersee.swagger.authman.samba.model.Password;
@@ -91,7 +94,7 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
   @Override
   public List<SambaGroupItem> getGroups() {
 
-    log.info("Getting samba groups ...");
+    log.info("msg=[Getting samba groups]");
     final SearchFilter sf = new SearchFilter(properties.getGroupFindAllFilter());
     final SearchRequest sr = new SearchRequest(properties.getGroupBaseDn(), sf);
     sr.setSearchScope(properties.getGroupFindAllSearchScope());
@@ -104,12 +107,12 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
           .stream()
           .map(mapper::mapLdapEntryToSambaGroupItem)
           .collect(Collectors.toList());
-      log.info("Getting samba groups: {} group(s) found.", groups.size());
+      log.info("msg=[Getting samba groups] resultSize=[{}]", groups.size());
       return groups;
 
     } catch (final LdapException e) {
       final LdapRuntimeException lre = new LdapRuntimeException(e);
-      log.error("Getting samba groups failed.", lre);
+      log.error("msg=[Getting samba groups failed.]", lre);
       throw lre;
 
     } finally {
@@ -120,7 +123,7 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
   @Override
   public SambaGroup addGroup(@Valid final SambaGroup group) {
 
-    log.info("Adding samba group {}", group);
+    log.info("msg=[Adding samba group] group=[{}]", group);
     try {
       getGroupByName(group.getName());
       throw new AlreadyExistsException(group);
@@ -151,18 +154,18 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
   @Override
   public SambaGroup getGroupByName(@NotNull final String groupName) {
 
-    log.info("Getting samba group by name [{}] ...", groupName);
+    log.info("msg=[Getting samba group by name] name=[{}]", groupName);
     Connection conn = null;
     try {
       conn = getConnection();
       final SambaGroup group = mapper.mapLdapEntryToSambaGroup(
           findGroupByName(groupName, conn).orElseThrow(NotFoundException::new));
-      log.info("Getting samba group by name [{}]: {}", groupName, group);
+      log.info("msg=[Getting samba group by name] name=[{}] group=[{}]", groupName, group);
       return group;
 
     } catch (final LdapException e) {
       final LdapRuntimeException lre = new LdapRuntimeException(e);
-      log.error("Getting samba group by name failed.", lre);
+      log.error("msg=[Getting samba group by name failed.]", lre);
       throw lre;
 
     } finally {
@@ -175,7 +178,7 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
       @NotNull final String groupName,
       @Valid final Names members) {
 
-    log.info("Updating samba group [{}] members {}", groupName, members);
+    log.info("msg=[Updating samba group members] group=[{}] members=[{}]", groupName, members);
     Connection conn = null;
     try {
       conn = getConnection();
@@ -186,7 +189,8 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
       final Set<String> oldUserDns = hasMemberAttr
           ? new HashSet<>(memberAttr.getStringValues())
           : new HashSet<>();
-      log.debug("Updating members of group {}: old members = {}", groupName, oldUserDns);
+      log.debug("msg=[Updating members of group] group=[{}] oldMembers=[{}]",
+          groupName, oldUserDns);
 
       final Set<String> newUserDns = members.getValues()
           .stream()
@@ -194,26 +198,29 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
               ? name.getValue()
               : createDn(properties.getUserRdn(), name.getValue(), properties.getUserBaseDn()))
           .collect(Collectors.toSet());
-      log.debug("Updating members of group {}: new members = {}", groupName, newUserDns);
+      log.debug("msg=[Updating members of group] group=[{}] newMembers=[{}]",
+          groupName, newUserDns);
 
       final Set<String> both = new HashSet<>(oldUserDns);
       both.retainAll(newUserDns);
-      log.debug("Updating members of group {}: kept members = {}", groupName, both);
+      log.debug("msg=[Updating members of group] group=[{}] keptMembers=[{}]", groupName, both);
 
       oldUserDns.removeAll(both);
-      log.debug("Updating members of group {}: remove old members = {}", groupName, oldUserDns);
+      log.debug("msg=[Updating members of group] group=[{}] removedOldMembers=[{}]",
+          groupName, oldUserDns);
       if (hasMemberAttr) {
         memberAttr.removeStringValues(oldUserDns);
       }
 
       newUserDns.removeAll(both);
-      log.debug("Updating members of group {}: add new members = {}", groupName, newUserDns);
+      log.debug("msg=[Updating members of group] group=[{}] addedNewMembers=[{}]",
+          groupName, newUserDns);
       if (hasMemberAttr) {
         memberAttr.addStringValues(newUserDns);
       } else {
         ldapEntry.addAttribute(new LdapAttribute(
             properties.getGroupMemberAttr(),
-            newUserDns.toArray(new String[newUserDns.size()])));
+            newUserDns.toArray(new String[0])));
       }
 
       final List<AttributeModification> mods = new ArrayList<>();
@@ -228,19 +235,19 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
       }
 
       if (!mods.isEmpty()) {
-        log.debug("Updating members of group {}: making {} modification(s).",
+        log.debug("msg=[Updating members of group {}: making {} modification(s).]",
             groupName, mods.size());
         new ModifyOperation(conn).execute(
             new ModifyRequest(
                 ldapEntry.getDn(),
-                mods.toArray(new AttributeModification[mods.size()])));
+                mods.toArray(new AttributeModification[0])));
       }
 
       return mapper.mapLdapEntryToSambaGroup(ldapEntry);
 
     } catch (final LdapException e) {
       final LdapRuntimeException lre = new LdapRuntimeException(e);
-      log.error("Updating samba group [{}] members failed.", groupName, lre);
+      log.error("msg=Updating samba group members failed.] group=[{}]", groupName, lre);
       throw lre;
 
     } finally {
@@ -251,24 +258,24 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
   @Override
   public void deleteGroup(@NotNull final String groupName) {
 
-    log.info("Deleting samba group [{}] ...", groupName);
+    log.info("msg=[Deleting samba group.] group=[{}]", groupName);
     sambaTool.deleteGroup(groupName);
   }
 
   @Override
   public boolean userExists(@NotNull final String userName) {
 
-    log.info("Checking whether samba user [{}] exists.", userName);
+    log.info("msg=[Checking whether samba user exists.] user=[{}]", userName);
     Connection conn = null;
     try {
       conn = getConnection();
       final boolean result = findUserByName(userName, conn).isPresent();
-      log.info("Samba user [{}] exists? {}", userName, result);
+      log.info("msg=[Samba user [{}] exists? {}]", userName, result);
       return result;
 
     } catch (final LdapException e) {
       final LdapRuntimeException lre = new LdapRuntimeException(e);
-      log.error("Checking whether samba user exists failed.", lre);
+      log.error("msg=[Checking whether samba user exists failed.]", lre);
       throw lre;
 
     } finally {
@@ -279,10 +286,10 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
   @Override
   public SambaUser addUser(@Valid final SambaUserAddRequest sambaUser) {
 
-    log.info("Adding samba user {}", sambaUser);
+    log.info("msg=[Adding samba user.] user=[{}]", sambaUser);
     try {
       getUser(sambaUser.getUserName());
-      log.debug("Samba user {} already exists. Updating it ...", sambaUser.getUserName());
+      log.debug("msg=[Samba user {} already exists. Updating it ...]", sambaUser.getUserName());
       final Password password = new Password();
       password.setValue(sambaUser.getPassword());
       updateUserPassword(sambaUser.getUserName(), password);
@@ -297,7 +304,7 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
           sambaUser.getEmail(),
           sambaUser.getMobile());
       final SambaUser user = updateUser(sambaUser.getUserName(), sambaUser);
-      log.info("Samba user successfully added: {}", user);
+      log.info("msg=[Samba user successfully added.] user=[{}]", user);
       return user;
     }
   }
@@ -319,18 +326,18 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
   @Override
   public SambaUser getUser(@NotNull final String userName) {
 
-    log.info("Getting samba user by name [{}] ...", userName);
+    log.info("msg=[Getting samba user by name.] name=[{}]", userName);
     Connection conn = null;
     try {
       conn = getConnection();
       final SambaUser user = mapper.mapLdapEntryToSambaUser(
           findUserByName(userName, conn).orElseThrow(NotFoundException::new));
-      log.info("Getting samba user by name [{}]: {}", userName, user);
+      log.info("msg=[Getting samba user by name.] name=[{}] user=[{}]", userName, user);
       return user;
 
     } catch (final LdapException e) {
       final LdapRuntimeException lre = new LdapRuntimeException(e);
-      log.error("Getting samba user by name failed.", lre);
+      log.error("msg=[Getting samba user by name failed.]", lre);
       throw lre;
 
     } finally {
@@ -341,7 +348,7 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
   @Override
   public SambaUser updateUser(@NotNull final String userName, @Valid final SambaUser sambaUser) {
 
-    log.info("Updating samba user [{}]: {}", userName, sambaUser);
+    log.info("msg=[Updating samba user.] name=[{}] user=[{}]", userName, sambaUser);
     Connection conn = null;
     try {
       conn = getConnection();
@@ -372,23 +379,23 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
           ldapEntry, "userAccountControl", String.valueOf(userAccountControl), mods);
 
       if (!mods.isEmpty()) {
-        log.debug("Updating samba user [{}]: making {} modification(s).",
+        log.debug("msg=[Updating samba user [{}]: making {} modification(s).]",
             userName, mods.size());
         new ModifyOperation(conn).execute(
             new ModifyRequest(
                 ldapEntry.getDn(),
-                mods.toArray(new AttributeModification[mods.size()])));
+                mods.toArray(new AttributeModification[0])));
       }
 
       updateUserGroups(ldapEntry, sambaUser.getGroups(), conn);
 
       final SambaUser user = mapper.mapLdapEntryToSambaUser(ldapEntry);
-      log.info("Samba user [{}] successfully updated: {}", userName, user);
+      log.info("msg=[Samba user successfully updated.] name=[{}] user=[{}]", userName, user);
       return user;
 
     } catch (final LdapException e) {
       final LdapRuntimeException lre = new LdapRuntimeException(e);
-      log.error("Getting user by name failed.", lre);
+      log.error("msg=[Getting user by name failed.]", lre);
       throw lre;
 
     } finally {
@@ -408,7 +415,7 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
     final Set<String> oldGroupDns = hasUserGroupAttr
         ? new HashSet<>(userGroupAttr.getStringValues())
         : new HashSet<>();
-    log.debug("Updating groups of {}: old groups = {}", userName, oldGroupDns);
+    log.debug("msg=[Updating groups of user.] name=[{}] oldGroups=[{}]", userName, oldGroupDns);
 
     final Set<String> newGroupDns = groups
         .stream()
@@ -416,26 +423,27 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
             ? name.getValue()
             : createDn(properties.getGroupRdn(), name.getValue(), properties.getGroupBaseDn()))
         .collect(Collectors.toSet());
-    log.debug("Updating groups of {}: new groups = {}", userName, newGroupDns);
+    log.debug("msg=[Updating groups of user.] name=[{}] newGroups=[{}]", userName, newGroupDns);
 
     final Set<String> both = new HashSet<>(oldGroupDns);
     both.retainAll(newGroupDns);
-    log.debug("Updating groups of {}: kept groups = {}", userName, both);
+    log.debug("msg=[Updating groups of user.] name=[{}] keptGroups=[{}]", userName, both);
 
     oldGroupDns.removeAll(both);
-    log.debug("Updating groups of {}: remove old groups = {}", userName, oldGroupDns);
+    log.debug("msg=[Updating groups of user.] name=[{}] removeOldGroups=[{}]",
+        userName, oldGroupDns);
     if (hasUserGroupAttr) {
       userGroupAttr.removeStringValues(oldGroupDns);
     }
 
     newGroupDns.removeAll(both);
-    log.debug("Updating groups of {}: add new groups = {}", userName, newGroupDns);
+    log.debug("msg=[Updating groups of user.] name=[{}] addNewGroups=[{}]", userName, newGroupDns);
     if (hasUserGroupAttr) {
       userGroupAttr.addStringValues(newGroupDns);
     } else if (!newGroupDns.isEmpty()) {
       ldapEntry.addAttribute(new LdapAttribute(
           properties.getUserGroupAttr(),
-          newGroupDns.toArray(new String[newGroupDns.size()])));
+          newGroupDns.toArray(new String[0])));
     }
 
     // We only have to modify the groups, the attribute 'memberOf' in the user entry is just a link.
@@ -462,7 +470,7 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
   @Override
   public SambaUser updateUserGroups(@NotNull final String userName, @Valid final Names groups) {
 
-    log.info("Updating samba user [{}]'s groups {}", userName, groups);
+    log.info("msg=[Updating samba user's groups.] name=[{}] groups=[{}]", userName, groups);
     Connection conn = null;
     try {
       conn = getConnection();
@@ -475,7 +483,7 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
 
     } catch (final LdapException e) {
       final LdapRuntimeException lre = new LdapRuntimeException(e);
-      log.error("Getting user by name failed.", lre);
+      log.error("msg=[Getting user by name failed.]", lre);
       throw lre;
 
     } finally {
@@ -488,14 +496,14 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
       @NotNull final String userName,
       @Valid final Password newPassword) {
 
-    log.info("Updating samba user [{}]'s password.", userName);
+    log.info("msg=[Updating samba user's password.] name=[{}]", userName);
     sambaTool.setNewPassword(userName, newPassword.getValue());
   }
 
   @Override
   public void deleteUser(@NotNull final String userName) {
 
-    log.info("Deleting samba user {}", userName);
+    log.info("msg=[Deleting samba user.] name=[{}]", userName);
     sambaTool.deleteUser(userName);
   }
 
@@ -521,6 +529,68 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
         log.warn("Closing ldap connection failed.", ex);
       }
     }
+  }
+
+  @Override
+  public List<DnsZone> getDnsZones() {
+    log.info("msg=[Getting name server zones.]");
+    return sambaTool.getDnsZones();
+  }
+
+  @Override
+  public void createDnsZone(@NotNull final String zoneName) {
+    log.info("msg=[Creating name server zone] zone=[{}]", zoneName);
+    sambaTool.createDnsZone(zoneName);
+  }
+
+  @Override
+  public void deleteDnsZone(@NotNull final String zoneName) {
+    log.info("msg=[Deleting name server zone] zone=[{}]", zoneName);
+    sambaTool.deleteDnsZone(zoneName);
+  }
+
+  @Override
+  public List<DnsEntry> getDnsRecords(@NotNull final String zoneName) {
+    log.info("msg=[Getting name server records.] zone=[{}]", zoneName);
+    return sambaTool.getDnsRecords(zoneName);
+  }
+
+  @Override
+  public void addDnsRecord(
+      @NotNull final String zoneName,
+      @NotNull final String name,
+      @NotNull final DnsRecordType recordType,
+      @NotNull final String data) {
+
+    log.info("msg=[Adding name server record] zoneName=[{}] name=[{}] recordType=[{}] data=[{}]",
+        zoneName, name, recordType, data);
+    sambaTool.addDnsRecord(zoneName, name, recordType, data);
+  }
+
+  @Override
+  public void deleteDnsRecord(
+      @NotNull final String zoneName,
+      @NotNull final String name,
+      @NotNull final DnsRecordType recordType,
+      @NotNull final String data) {
+
+    log.info("msg=[Deleting name server record] zoneName=[{}] name=[{}] recordType=[{}] data=[{}]",
+        zoneName, name, recordType, data);
+    sambaTool.deleteDnsRecord(zoneName, name, recordType, data);
+  }
+
+  @Override
+  public void updateDnsRecord(
+      @NotNull final String zoneName,
+      @NotNull final String name,
+      @NotNull final DnsRecordType recordType,
+      @NotNull final String oldData,
+      @NotNull final String newData) {
+
+    log.info("msg=[Deleting name server record] zoneName=[{}] name=[{}] recordType=[{}] "
+            + "oldData=[{}], newData=[{}]",
+        zoneName, name, recordType, newData, oldData);
+    sambaTool.updateDnsRecord(zoneName, name, recordType, oldData, newData);
   }
 
 }

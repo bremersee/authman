@@ -5,4 +5,4 @@ Priority: optional
 Architecture: all
 Description: [[description]]
 Maintainer: bremersee@googlemail.com
-Depends: default-jre | java8-runtime, sudo
+Depends: default-jre-headless, sudo

@@ -265,6 +265,7 @@
           </execution>
         </executions>
         <configuration>
+          <skip>${dockerfile.skip}</skip>
           <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
           <repository>docker.io/bremersee/authman</repository>
           <tag>latest</tag>

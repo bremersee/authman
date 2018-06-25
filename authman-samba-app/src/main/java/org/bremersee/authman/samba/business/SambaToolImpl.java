@@ -20,7 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.bremersee.authman.samba.LdaptiveProperties;
 import org.bremersee.authman.samba.SambaDomainProperties;
+import org.bremersee.swagger.authman.samba.model.DnsEntry;
+import org.bremersee.swagger.authman.samba.model.DnsRecordType;
+import org.bremersee.swagger.authman.samba.model.DnsZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -31,6 +35,8 @@ import org.springframework.util.StringUtils;
 @Component
 @Slf4j
 public class SambaToolImpl implements SambaTool {
+
+  //samba-tool nameserver query dc.eixe.bremersee.org eixe.bremersee.org @ ALL --simple-bind-dn="cn=administrator,cn=users,dc=eixe,dc=bremersee,dc=org" --password="{}"
 
   private static final String SUB_CMD_USER_MANAGEMENT = "user";
 
@@ -64,11 +70,189 @@ public class SambaToolImpl implements SambaTool {
   private static final String GROUP_CMD_DELETE = "delete";
 
 
+  private static final String SUB_CMD_DNS_MANAGEMENT = "nameserver";
+
+
+  private static final String DNS_CMD_ZONELIST = "zonelist";
+
+  private static final String DNS_CMD_ZONECREATE = "zonecreate";
+
+  private static final String DNS_CMD_ZONEDELETE = "zonedelete";
+
+  private static final String DNS_CMD_QUERY = "query";
+
+  private static final String DNS_CMD_ADD = "add";
+
+  private static final String DNS_CMD_DELETE = "delete";
+
+  private static final String DNS_CMD_UPDATE = "update";
+
+
+  private static final String DNS_SIMPLE_BIND_DN = "--simple-bind-dn=\"{}\"";
+
+  private static final String DNS_SIMPLE_BIND_PASSWORD = "--password=\"{}\""; // NOSONAR
+
+
   private final SambaDomainProperties properties;
 
+  private final LdaptiveProperties adProperties;
+
+  private final SambaToolResponseParser responseParser;
+
   @Autowired
-  public SambaToolImpl(final SambaDomainProperties properties) {
+  public SambaToolImpl(
+      final SambaDomainProperties properties,
+      final LdaptiveProperties adProperties,
+      final SambaToolResponseParser responseParser) {
     this.properties = properties;
+    this.adProperties = adProperties;
+    this.responseParser = responseParser;
+  }
+
+  @Override
+  public List<DnsZone> getDnsZones() {
+
+    final List<String> commands = new ArrayList<>();
+    if (properties.isUsingSudo()) {
+      commands.add(properties.getSudoBinary());
+    }
+    commands.add(properties.getSambaToolBinary());
+    commands.add(SUB_CMD_DNS_MANAGEMENT);
+    commands.add(DNS_CMD_ZONELIST);
+    commands.add(properties.getDnsServerName());
+    commands.add(DNS_SIMPLE_BIND_DN.replace("{}", adProperties.getBindDn()));
+    commands.add(DNS_SIMPLE_BIND_PASSWORD.replace("{}", adProperties.getBindCredential()));
+
+    final CommandExecutorResponse response = CommandExecutor.exec(
+        commands, properties.getSambaToolExecDir());
+    return responseParser.parseDnsZones(response);
+  }
+
+  @Override
+  public void createDnsZone(@NotNull final String zoneName) {
+    execDnsZoneCmd(DNS_CMD_ZONECREATE, zoneName);
+  }
+
+  @Override
+  public void deleteDnsZone(@NotNull final String zoneName) {
+    execDnsZoneCmd(DNS_CMD_ZONEDELETE, zoneName);
+  }
+
+  private void execDnsZoneCmd(
+      @NotNull final String dnsCommand,
+      @NotNull final String zoneName) {
+
+    final List<String> commands = new ArrayList<>();
+    if (properties.isUsingSudo()) {
+      commands.add(properties.getSudoBinary());
+    }
+    commands.add(properties.getSambaToolBinary());
+    commands.add(SUB_CMD_DNS_MANAGEMENT);
+    commands.add(dnsCommand);
+    commands.add(properties.getDnsServerName());
+    commands.add(zoneName);
+    commands.add(DNS_SIMPLE_BIND_DN.replace("{}", adProperties.getBindDn()));
+    commands.add(DNS_SIMPLE_BIND_PASSWORD.replace("{}", adProperties.getBindCredential()));
+
+    final CommandExecutorResponse response = CommandExecutor.exec(
+        commands, properties.getSambaToolExecDir());
+    if (StringUtils.hasText(response.getError())) {
+      log.warn("Executing '{}' zone name '{}' failed:\n{}",
+          dnsCommand, zoneName, response.getOutput());
+    } else {
+      log.info("Executing '{}' zone name '{}' with response:\n{}",
+          dnsCommand, zoneName, response.getOutput());
+    }
+  }
+
+  @Override
+  public List<DnsEntry> getDnsRecords(@NotNull final String zoneName) {
+
+    final List<String> commands = new ArrayList<>();
+    if (properties.isUsingSudo()) {
+      commands.add(properties.getSudoBinary());
+    }
+    commands.add(properties.getSambaToolBinary());
+    commands.add(SUB_CMD_DNS_MANAGEMENT);
+    commands.add(DNS_CMD_QUERY);
+    commands.add(properties.getDnsServerName());
+    commands.add(zoneName);
+    commands.add("@");
+    commands.add("ALL");
+    commands.add(DNS_SIMPLE_BIND_DN.replace("{}", adProperties.getBindDn()));
+    commands.add(DNS_SIMPLE_BIND_PASSWORD.replace("{}", adProperties.getBindCredential()));
+
+    final CommandExecutorResponse response = CommandExecutor.exec(
+        commands, properties.getSambaToolExecDir());
+    return responseParser.parseDnsRecords(response);
+  }
+
+  @Override
+  public void addDnsRecord(
+      @NotNull final String zoneName,
+      @NotNull final String name,
+      @NotNull final DnsRecordType recordType,
+      @NotNull final String data) {
+
+    execDnsRecordCmd(DNS_CMD_ADD, zoneName, name, recordType, data, null);
+  }
+
+  @Override
+  public void deleteDnsRecord(
+      @NotNull final String zoneName,
+      @NotNull final String name,
+      @NotNull final DnsRecordType recordType,
+      @NotNull final String data) {
+
+    execDnsRecordCmd(DNS_CMD_DELETE, zoneName, name, recordType, data, null);
+  }
+
+  @Override
+  public void updateDnsRecord(
+      @NotNull final String zoneName,
+      @NotNull final String name,
+      @NotNull final DnsRecordType recordType,
+      @NotNull final String oldData,
+      @NotNull final String newData) {
+
+    execDnsRecordCmd(DNS_CMD_UPDATE, zoneName, name, recordType, oldData, newData);
+  }
+
+  private void execDnsRecordCmd(
+      @NotNull final String dnsCommand,
+      @NotNull final String zoneName,
+      @NotNull final String name,
+      @NotNull final DnsRecordType recordType,
+      @NotNull final String data,
+      final String newData) {
+
+    final List<String> commands = new ArrayList<>();
+    if (properties.isUsingSudo()) {
+      commands.add(properties.getSudoBinary());
+    }
+    commands.add(properties.getSambaToolBinary());
+    commands.add(SUB_CMD_DNS_MANAGEMENT);
+    commands.add(dnsCommand);
+    commands.add(properties.getDnsServerName());
+    commands.add(zoneName);
+    commands.add(name);
+    commands.add(recordType.name());
+    commands.add(data);
+    if (DNS_CMD_UPDATE.equals(dnsCommand) && StringUtils.hasText(newData)) {
+      commands.add(newData);
+    }
+    commands.add(DNS_SIMPLE_BIND_DN.replace("{}", adProperties.getBindDn()));
+    commands.add(DNS_SIMPLE_BIND_PASSWORD.replace("{}", adProperties.getBindCredential()));
+
+    final CommandExecutorResponse response = CommandExecutor.exec(
+        commands, properties.getSambaToolExecDir());
+    if (StringUtils.hasText(response.getError())) {
+      log.warn("Executing '{}' {} Record of hostname {} failed:\n{}",
+          dnsCommand, recordType, name, response.getOutput());
+    } else {
+      log.info("Executing '{}' {} Record of hostname {} with response:\n{}",
+          dnsCommand, recordType, name, response.getOutput());
+    }
   }
 
   @Override

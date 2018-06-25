@@ -16,7 +16,11 @@
 
 package org.bremersee.authman.samba.business;
 
+import java.util.List;
 import javax.validation.constraints.NotNull;
+import org.bremersee.swagger.authman.samba.model.DnsEntry;
+import org.bremersee.swagger.authman.samba.model.DnsRecordType;
+import org.bremersee.swagger.authman.samba.model.DnsZone;
 
 /**
  * @author Christian Bremer
@@ -38,5 +42,33 @@ public interface SambaTool {
   void addGroup(@NotNull String groupName);
 
   void deleteGroup(@NotNull String groupName);
+
+
+  List<DnsZone> getDnsZones();
+
+  void createDnsZone(@NotNull String zoneName);
+
+  void deleteDnsZone(@NotNull String zoneName);
+
+  List<DnsEntry> getDnsRecords(@NotNull String zoneName);
+
+  void addDnsRecord(
+      @NotNull String zoneName,
+      @NotNull String name,
+      @NotNull DnsRecordType recordType,
+      @NotNull String data);
+
+  void deleteDnsRecord(
+      @NotNull String zoneName,
+      @NotNull String name,
+      @NotNull DnsRecordType recordType,
+      @NotNull String data);
+
+  void updateDnsRecord(
+      @NotNull String zoneName,
+      @NotNull String name,
+      @NotNull DnsRecordType recordType,
+      @NotNull String oldData,
+      @NotNull String newData);
 
 }

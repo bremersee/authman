@@ -22,6 +22,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.bremersee.swagger.authman.samba.model.Info;
 import org.ldaptive.SearchScope;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -79,5 +80,14 @@ public class SambaDomainProperties implements Serializable {
   private String loginShell = "/bin/bash";
 
   private String unixHomeDirTemplate = "/home/{}";
+
+
+  private String dnsServerName = "ns.example.org";
+
+
+  public Info buildInfo() {
+    return new Info()
+        .nameServerHost(dnsServerName);
+  }
 
 }

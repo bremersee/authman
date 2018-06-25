@@ -18,6 +18,23 @@ schemes:
   - "http"
   - "https"
 paths:
+  /api/v1/info:
+    get:
+      tags:
+        - "samba-connector-controller"
+      summary: "Get samba server info."
+      description: "Get samba server info."
+      operationId: "getInfo"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "The samba server info."
+          schema:
+            $ref: "#/definitions/Info"
+      security:
+        - bremersee_auth:
+          - "samba:admin"
   /api/v1/groups:
     get:
       tags:
@@ -330,6 +347,139 @@ paths:
       security:
         - bremersee_auth:
           - "samba:admin"
+  /api/v1/dns/zones:
+    get:
+      tags:
+        - "samba-connector-controller"
+      summary: "Get all nameserver zones."
+      description: "Get all nameserver zones."
+      operationId: "getDnsZones"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "A list with nameserver zones."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/DnsZone"
+      security:
+        - bremersee_auth:
+          - "samba:admin"
+    post:
+      tags:
+        - "samba-connector-controller"
+      summary: "Create new nameserver zone."
+      description: "Create new nameserver zone."
+      operationId: "createDnsZone"
+      parameters:
+        - name: "request"
+          in: "body"
+          schema:
+            $ref: "#/definitions/DnsZoneCreateRequest"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "The zone was successfully created."
+      security:
+        - bremersee_auth:
+          - "samba:admin"
+    delete:
+      tags:
+        - "samba-connector-controller"
+      summary: "Delete nameserver zone."
+      description: "Delete nameserver zone."
+      operationId: "deleteDnsZone"
+      parameters:
+        - name: "zoneName"
+          in: "query"
+          type: "string"
+          required: true
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "The zone was successfully created."
+      security:
+        - bremersee_auth:
+          - "samba:admin"
+  /api/v1/dns/zones/records:
+    get:
+      tags:
+        - "samba-connector-controller"
+      summary: "Get all nameserver records of a zone."
+      description: "Get all nameserver records of a zone."
+      operationId: "getDnsRecords"
+      parameters:
+        - name: "zoneName"
+          description: "The nameserver zone name."
+          type: "string"
+          required: true
+          in: "query"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "A list with nameserver records."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/DnsEntry"
+      security:
+        - bremersee_auth:
+          - "samba:admin"
+    post:
+      tags:
+        - "samba-connector-controller"
+      summary: "Create or delete nameserver record."
+      description: "Create or delete nameserver record."
+      operationId: "createOrDeleteDnsRecord"
+      parameters:
+        - name: "action"
+          in: "query"
+          type: string
+          enum:
+            - "CREATE"
+            - "DELETE"
+          required: true
+        - name: "request"
+          in: "body"
+          schema:
+            $ref: "#/definitions/DnsRecordRequest"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "The nameserver record was successfully created."
+      security:
+        - bremersee_auth:
+          - "samba:admin"
+    put:
+      tags:
+        - "samba-connector-controller"
+      summary: "Update nameserver record."
+      description: "Update nameserver record."
+      operationId: "updateDnsRecord"
+      parameters:
+        - name: "request"
+          in: "body"
+          schema:
+            $ref: "#/definitions/DnsRecordUpdateRequest"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          description: "The nameserver record was successfully created."
+      security:
+        - bremersee_auth:
+          - "samba:admin"
 securityDefinitions:
   bremersee_auth:
     type: "oauth2"
@@ -348,6 +498,13 @@ definitions:
         description: "The boolean value."
     required:
       - value
+  Info:
+    description: "A description of the samba domain controller."
+    type: "object"
+    properties:
+      nameServerHost:
+        type: "string"
+        description: "The host name of the name server."
   Name:
     description: "A simple name or a distinguished name."
     type: "object"
@@ -455,3 +612,174 @@ definitions:
         description: "A password."
     required:
       - value
+  DnsZoneFlag:
+    type: "object"
+    description: "DNS Zone Flag"
+    properties:
+      name:
+        type: "string"
+        description: "The zone flag name."
+    required:
+      - name
+  DnsDwDpZoneFlag:
+    type: "object"
+    description: "DNS Zone Flag"
+    properties:
+      name:
+        type: "string"
+        description: "The zone flag name."
+    required:
+      - name
+  DnsZone:
+    type: "object"
+    description: "DNS Zone"
+    properties:
+      pszZoneName:
+        type: "string"
+        description: "The zone name."
+      flags:
+        type: "array"
+        items:
+          $ref: "#/definitions/DnsZoneFlag"
+        description: "The zone flags."
+      zoneType:
+        type: "string"
+        description: "The zone type."
+      version:
+        type: "string"
+        description: "The version."
+      dwDpFlags:
+        type: "array"
+        items:
+          $ref: "#/definitions/DnsDwDpZoneFlag"
+        description: "The dwDp zone flags."
+      pszDpFqdn:
+        type: "string"
+        description: "The pszDpFqdn."
+  DnsZoneCreateRequest:
+    type: "object"
+    description: "DNS Zone Create Request"
+    properties:
+      pszZoneName:
+        type: "string"
+        description: "The zone name."
+    required:
+      - pszZoneName
+  DnsRecordType:
+    type: "string"
+    description: "DNS Record Types."
+    enum:
+      - "A"
+      - "AAAA"
+      - "PTR"
+      - "CNAME"
+      - "NS"
+      - "MX"
+      - "SRV"
+      - "TXT"
+      - "SOA"
+      - "AFSDB"
+      - "APL"
+      - "CAA"
+      - "CDNSKEY"
+      - "CDS"
+      - "CERT"
+      - "DHCID"
+      - "DLV"
+      - "DNAME"
+      - "DNSKEY"
+      - "DS"
+      - "HIP"
+      - "IPSECKEY"
+      - "KEY"
+      - "KX"
+      - "LOC"
+      - "NAPTR"
+      - "NSEC"
+      - "NSEC3"
+      - "NSEC3PARAM"
+      - "OPENPGPKEY"
+      - "RRSIG"
+      - "RP"
+      - "SIG"
+      - "SSHFP"
+      - "TA"
+      - "TKEY"
+      - "TLSA"
+      - "TSIG"
+      - "URI"
+  DnsRecordRequest:
+    type: "object"
+    description: "DNS Record Create Request"
+    properties:
+      zoneName:
+        type: "string"
+        description: "The zone name."
+      name:
+        type: "string"
+        description: "The record name."
+      recordType:
+        $ref: '#/definitions/DnsRecordType'
+      data:
+        type: "string"
+        description: "The record data."
+    required:
+      - zoneName
+      - name
+      - recordType
+      - data
+  DnsRecordUpdateRequest:
+    type: "object"
+    description: "DNS Record Create Request"
+    properties:
+      zoneName:
+        type: "string"
+        description: "The zone name."
+      name:
+        type: "string"
+        description: "The record name."
+      recordType:
+        $ref: '#/definitions/DnsRecordType'
+      oldData:
+        type: "string"
+        description: "The old record data."
+      newData:
+        type: "string"
+        description: "The new record data."
+    required:
+      - zoneName
+      - name
+      - recordType
+      - oldData
+      - newData
+  DnsRecord:
+    type: "object"
+    description: "DNS Record"
+    properties:
+      recordType:
+        type: "string"
+        description: "The nameserver record type."
+      recordValue:
+        type: "string"
+        description: "The nameserver record value."
+      flags:
+        type: "string"
+        description: "The nameserver record flags."
+      serial:
+        type: "string"
+        description: "The nameserver record serial."
+      ttl:
+        type: "string"
+        description: "The nameserver record ttl."
+  DnsEntry:
+    type: "object"
+    description: "DNS Record"
+    properties:
+      name:
+        type: "string"
+        description: "The entry name."
+      records:
+        type: "array"
+        items:
+          $ref: "#/definitions/DnsRecord"
+        description: "The nameserver records."

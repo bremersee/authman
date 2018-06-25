@@ -16,13 +16,21 @@
 
 package org.bremersee.swagger.authman.samba;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.authman.domain.UserProfileRepository;
 import org.bremersee.swagger.authman.samba.api.SambaConnectorControllerApi;
 import org.bremersee.swagger.authman.samba.model.BooleanWrapper;
+import org.bremersee.swagger.authman.samba.model.DnsEntry;
+import org.bremersee.swagger.authman.samba.model.DnsRecordRequest;
+import org.bremersee.swagger.authman.samba.model.DnsRecordUpdateRequest;
+import org.bremersee.swagger.authman.samba.model.DnsZone;
+import org.bremersee.swagger.authman.samba.model.DnsZoneCreateRequest;
+import org.bremersee.swagger.authman.samba.model.Info;
 import org.bremersee.swagger.authman.samba.model.Names;
 import org.bremersee.swagger.authman.samba.model.Password;
 import org.bremersee.swagger.authman.samba.model.SambaGroup;
@@ -61,7 +69,27 @@ public class SambaConnectorFallback extends SambaConnectorMock
   }
 
   @Override
-  public ResponseEntity<Void> deleteGroup(String groupName) {
+  public ResponseEntity<Void> createDnsZone(@Valid final DnsZoneCreateRequest request) {
+    log.error("Creating name server zone {} failed. Running samba connector fallback.", request);
+    return ResponseEntity.ok().build();
+  }
+
+  @Override
+  public ResponseEntity<Void> createOrDeleteDnsRecord(
+      @NotNull @Valid final String action,
+      @Valid final DnsRecordRequest request) {
+    log.error("Executing '{}' with {} failed. Running samba connector fallback.", action, request);
+    return ResponseEntity.ok().build();
+  }
+
+  @Override
+  public ResponseEntity<Void> deleteDnsZone(@NotNull @Valid final String zoneName) {
+    log.error("Deleting name server zone {} failed. Running samba connector fallback.", zoneName);
+    return ResponseEntity.ok().build();
+  }
+
+  @Override
+  public ResponseEntity<Void> deleteGroup(final String groupName) {
     log.error("Deleting samba group {} failed. Running samba connector fallback.", groupName);
     return ResponseEntity.ok().build();
   }
@@ -70,6 +98,18 @@ public class SambaConnectorFallback extends SambaConnectorMock
   public ResponseEntity<Void> deleteUser(String userName) {
     log.error("Deleting samba user {} failed. Running samba connector fallback.", userName);
     return ResponseEntity.ok().build();
+  }
+
+  @Override
+  public ResponseEntity<List<DnsZone>> getDnsZones() {
+    log.error("Getting name server zones failed. Returning empty list.");
+    return ResponseEntity.ok(new ArrayList<>());
+  }
+
+  @Override
+  public ResponseEntity<List<DnsEntry>> getDnsRecords(@NotNull @Valid String zoneName) {
+    log.error("Getting name server records of zone [{}] failed. Returning empty list.", zoneName);
+    return ResponseEntity.ok(new ArrayList<>());
   }
 
   @Override
@@ -105,6 +145,12 @@ public class SambaConnectorFallback extends SambaConnectorMock
   }
 
   @Override
+  public ResponseEntity<Void> updateDnsRecord(@Valid DnsRecordUpdateRequest request) {
+    log.error("Updating name server with {} failed. Running samba connector fallback.", request);
+    return ResponseEntity.ok().build();
+  }
+
+  @Override
   public ResponseEntity<SambaGroup> updateGroupMembers(String groupName, @Valid Names members) {
     log.error("Updating samba group {} failed. Running samba connector fallback.", groupName);
     return ResponseEntity.ok(createGroup(groupName));
@@ -128,4 +174,12 @@ public class SambaConnectorFallback extends SambaConnectorMock
         userName);
     return ResponseEntity.ok().build();
   }
+
+  @Override
+  public ResponseEntity<Info> getInfo() {
+    return ResponseEntity.ok(
+        new Info()
+            .nameServerHost("ns.example.org"));
+  }
+
 }

@@ -20,6 +20,10 @@ import java.util.Collection;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import org.bremersee.authman.domain.UserProfile;
+import org.bremersee.swagger.authman.samba.model.DnsEntry;
+import org.bremersee.swagger.authman.samba.model.DnsRecordType;
+import org.bremersee.swagger.authman.samba.model.DnsZone;
+import org.bremersee.swagger.authman.samba.model.Info;
 import org.bremersee.swagger.authman.samba.model.SambaGroup;
 import org.bremersee.swagger.authman.samba.model.SambaGroupItem;
 import org.bremersee.swagger.authman.samba.model.SambaUser;
@@ -28,6 +32,9 @@ import org.bremersee.swagger.authman.samba.model.SambaUser;
  * @author Christian Bremer
  */
 public interface SambaConnectorService {
+
+  Info getInfo();
+
 
   SambaGroup addGroup(@NotNull SambaGroup group);
 
@@ -61,5 +68,33 @@ public interface SambaConnectorService {
   void updateUserPasswordAsync(@NotNull String userName, @NotNull String newPassword);
 
   boolean userExists(@NotNull String userName);
+
+
+  List<DnsZone> getDnsZones();
+
+  void createDnsZone(@NotNull String zoneName);
+
+  void deleteDnsZone(@NotNull String zoneName);
+
+  List<DnsEntry> getDnsRecords(@NotNull String zoneName);
+
+  void addDnsRecord(
+      @NotNull String zoneName,
+      @NotNull String name,
+      @NotNull DnsRecordType recordType,
+      @NotNull String data);
+
+  void updateDnsRecord(
+      @NotNull String zoneName,
+      @NotNull String name,
+      @NotNull DnsRecordType recordType,
+      @NotNull String oldData,
+      @NotNull String newData);
+
+  void deleteDnsRecord(
+      @NotNull String zoneName,
+      @NotNull String name,
+      @NotNull DnsRecordType recordType,
+      @NotNull String data);
 
 }

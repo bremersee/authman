@@ -25,6 +25,13 @@ import org.bremersee.authman.domain.UserProfile;
 import org.bremersee.authman.model.SambaSettingsDto;
 import org.bremersee.swagger.authman.samba.api.SambaConnectorControllerApi;
 import org.bremersee.swagger.authman.samba.model.BooleanWrapper;
+import org.bremersee.swagger.authman.samba.model.DnsEntry;
+import org.bremersee.swagger.authman.samba.model.DnsRecordRequest;
+import org.bremersee.swagger.authman.samba.model.DnsRecordType;
+import org.bremersee.swagger.authman.samba.model.DnsRecordUpdateRequest;
+import org.bremersee.swagger.authman.samba.model.DnsZone;
+import org.bremersee.swagger.authman.samba.model.DnsZoneCreateRequest;
+import org.bremersee.swagger.authman.samba.model.Info;
 import org.bremersee.swagger.authman.samba.model.Name;
 import org.bremersee.swagger.authman.samba.model.Names;
 import org.bremersee.swagger.authman.samba.model.Password;
@@ -51,6 +58,11 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
   public SambaConnectorServiceImpl(
       final SambaConnectorControllerApi sambaConnector) {
     this.sambaConnector = sambaConnector;
+  }
+
+  @Override
+  public Info getInfo() {
+    return sambaConnector.getInfo().getBody();
   }
 
   @Override
@@ -244,6 +256,77 @@ public class SambaConnectorServiceImpl implements SambaConnectorService {
   @Override
   public void updateUserPasswordAsync(@NotNull String userName, @NotNull String newPassword) {
     updateUserPassword(userName, newPassword);
+  }
+
+  @Override
+  public List<DnsZone> getDnsZones() {
+    return sambaConnector.getDnsZones().getBody();
+  }
+
+  @Async
+  @Override
+  public void createDnsZone(@NotNull final String zoneName) {
+    sambaConnector.createDnsZone(new DnsZoneCreateRequest().pszZoneName(zoneName));
+  }
+
+  @Async
+  @Override
+  public void deleteDnsZone(@NotNull final String zoneName) {
+    sambaConnector.deleteDnsZone(zoneName);
+  }
+
+  @Override
+  public List<DnsEntry> getDnsRecords(@NotNull final String zoneName) {
+    return sambaConnector.getDnsRecords(zoneName).getBody();
+  }
+
+  @Async
+  @Override
+  public void addDnsRecord(
+      @NotNull final String zoneName,
+      @NotNull final String name,
+      @NotNull final DnsRecordType recordType,
+      @NotNull final String data) {
+    sambaConnector.createOrDeleteDnsRecord(
+        "CREATE",
+        new DnsRecordRequest()
+            .zoneName(zoneName)
+            .name(name)
+            .recordType(recordType)
+            .data(data));
+  }
+
+  @Async
+  @Override
+  public void updateDnsRecord(
+      @NotNull final String zoneName,
+      @NotNull final String name,
+      @NotNull final DnsRecordType recordType,
+      @NotNull final String oldData,
+      @NotNull final String newData) {
+    sambaConnector.updateDnsRecord(
+        new DnsRecordUpdateRequest()
+            .zoneName(zoneName)
+            .name(name)
+            .recordType(recordType)
+            .oldData(oldData)
+            .newData(newData));
+  }
+
+  @Async
+  @Override
+  public void deleteDnsRecord(
+      @NotNull final String zoneName,
+      @NotNull final String name,
+      @NotNull final DnsRecordType recordType,
+      @NotNull final String data) {
+    sambaConnector.createOrDeleteDnsRecord(
+        "DELETE",
+        new DnsRecordRequest()
+            .zoneName(zoneName)
+            .name(name)
+            .recordType(recordType)
+            .data(data));
   }
 
 }

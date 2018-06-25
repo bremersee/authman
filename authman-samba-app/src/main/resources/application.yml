@@ -32,7 +32,7 @@ bremersee:
   samba-domain:
     group-base-dn: ${LDAP_GROUP_DN:cn=Groups,dc=example,dc=org}
     user-base-dn: ${LDAP_USER_DN:cn=Users,dc=example,dc=org}
-    dns-server-name: ${DNS_SERVER_NAME:ns.example.org}
+    name-server-host: ${NAME_SERVER_HOST:ns.example.org}
 
 eureka:
   client:

@@ -82,12 +82,12 @@ public class SambaDomainProperties implements Serializable {
   private String unixHomeDirTemplate = "/home/{}";
 
 
-  private String dnsServerName = "ns.example.org";
+  private String nameServerHost = "ns.example.org";
 
 
   public Info buildInfo() {
     return new Info()
-        .nameServerHost(dnsServerName);
+        .nameServerHost(nameServerHost);
   }
 
 }

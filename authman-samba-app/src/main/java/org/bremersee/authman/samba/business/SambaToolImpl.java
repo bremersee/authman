@@ -119,7 +119,7 @@ public class SambaToolImpl implements SambaTool {
     commands.add(properties.getSambaToolBinary());
     commands.add(SUB_CMD_DNS_MANAGEMENT);
     commands.add(DNS_CMD_ZONELIST);
-    commands.add(properties.getDnsServerName());
+    commands.add(properties.getNameServerHost());
     commands.add(DNS_SIMPLE_BIND_DN.replace("{}", adProperties.getBindDn()));
     commands.add(DNS_SIMPLE_BIND_PASSWORD.replace("{}", adProperties.getBindCredential()));
 
@@ -149,7 +149,7 @@ public class SambaToolImpl implements SambaTool {
     commands.add(properties.getSambaToolBinary());
     commands.add(SUB_CMD_DNS_MANAGEMENT);
     commands.add(dnsCommand);
-    commands.add(properties.getDnsServerName());
+    commands.add(properties.getNameServerHost());
     commands.add(zoneName);
     commands.add(DNS_SIMPLE_BIND_DN.replace("{}", adProperties.getBindDn()));
     commands.add(DNS_SIMPLE_BIND_PASSWORD.replace("{}", adProperties.getBindCredential()));
@@ -175,7 +175,7 @@ public class SambaToolImpl implements SambaTool {
     commands.add(properties.getSambaToolBinary());
     commands.add(SUB_CMD_DNS_MANAGEMENT);
     commands.add(DNS_CMD_QUERY);
-    commands.add(properties.getDnsServerName());
+    commands.add(properties.getNameServerHost());
     commands.add(zoneName);
     commands.add("@");
     commands.add("ALL");
@@ -233,7 +233,7 @@ public class SambaToolImpl implements SambaTool {
     commands.add(properties.getSambaToolBinary());
     commands.add(SUB_CMD_DNS_MANAGEMENT);
     commands.add(dnsCommand);
-    commands.add(properties.getDnsServerName());
+    commands.add(properties.getNameServerHost());
     commands.add(zoneName);
     commands.add(name);
     commands.add(recordType.name());

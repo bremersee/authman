@@ -17,7 +17,6 @@
 package org.bremersee.authman.security.authentication;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.ArrayUtils;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -75,13 +75,17 @@ public class OAuth2CallbackFilter extends AbstractAuthenticationProcessingFilter
   }
 
   @Override
-  public Authentication attemptAuthentication(HttpServletRequest request,
-      HttpServletResponse response) {
+  public Authentication attemptAuthentication(
+      final HttpServletRequest request,
+      final HttpServletResponse response) {
 
     log.debug("Attempting OAuth2 authentication ...");
 
     final Map<String, String[]> params = request.getParameterMap();
-    log.debug("Parameters from OAuth2 = " + params);
+    if (log.isDebugEnabled()) {
+      params.forEach((s, strings) -> log.info(
+          "Parameter from OAuth2: {}={}", s, ArrayUtils.toString(strings, "null")));
+    }
 
     final String error = request.getParameter(properties.getResponseErrorParameter());
     if (StringUtils.hasText(error)) {
@@ -94,6 +98,7 @@ public class OAuth2CallbackFilter extends AbstractAuthenticationProcessingFilter
     OAuth2AuthenticationException.validateNotBlank(savedState,
         "Saved state is not present.");
     final String state = request.getParameter(properties.getResponseStateParameter());
+    stateCache.removeState(request);
     OAuth2AuthenticationException.validateNotBlank(state, "State is not present.");
     if (!savedState.equals(state)) {
       final OAuth2AuthenticationException exception = new OAuth2AuthenticationException(
@@ -101,7 +106,6 @@ public class OAuth2CallbackFilter extends AbstractAuthenticationProcessingFilter
       log.error("Facebook login failed.", exception); // NOSONAR
       throw exception;
     }
-    stateCache.removeState(request);
 
     final String code = request.getParameter(properties.getResponseCodeParameter());
     if (!StringUtils.hasText(code)) {
@@ -114,6 +118,7 @@ public class OAuth2CallbackFilter extends AbstractAuthenticationProcessingFilter
     final CodeExchangeResponse credentials = exchangeCode(code);
     final ForeignUserProfile profile = foreignUserProfileRequestor
         .getForeignUserProfile(credentials);
+
     final Authentication authRequest = new OAuth2AuthenticationToken(properties.getProvider(),
         credentials,
         profile, properties.scopes());
@@ -125,21 +130,14 @@ public class OAuth2CallbackFilter extends AbstractAuthenticationProcessingFilter
   protected CodeExchangeResponse exchangeCode(@NotNull final String code) {
 
     final RestTemplate restTemplate = restTemplateBuilder.build();
-
-    final Map<String, Object> params = new LinkedHashMap<>();
-    params.put("clientId", properties.getClientId());
-    params.put("clientSecret", properties.getClientSecret());
-    params.put("code", code);
-    params.put("redirectUri", properties.getRedirectUri());
-    params.putAll(properties.getAdditionalTokenParameters());
-
+    final Map<String, Object> params = properties.buildExchangeCodeRequestParameters(
+        code, null, null);
     final String url = properties.getTokenUrlTemplate();
     final HttpMethod httpMethod = properties.getTokenMethod();
     HttpEntity<String> httpEntity = new HttpEntity<>("");
     for (Map.Entry<String, String> headerEntry : properties.getTokenHeaders().entrySet()) {
       httpEntity.getHeaders().set(headerEntry.getKey(), headerEntry.getValue());
     }
-
     final ResponseEntity<CodeExchangeResponse> response = restTemplate
         .exchange(url, httpMethod, httpEntity,
             CodeExchangeResponse.class, params);

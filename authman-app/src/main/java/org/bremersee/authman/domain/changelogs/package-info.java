@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package org.bremersee.authman.domain;
-
-import java.util.Optional;
-import org.springframework.data.mongodb.repository.MongoRepository;
-
 /**
+ * This package contains change logs of mongobee (see {@link org.bremersee.authman.MongobeeConfiguration}).
+ * <p>
+ * A change log class looks like:
+ * <pre>
+ * {@literal @}ChangeLog
+ * public class DatabaseChangelog {
+ *
+ *   {@literal @}ChangeSet(order = "001", id = "someChangeId", author = "testAuthor")
+ *   public void importantWorkToDo(DB db){
+ *      // task implementation
+ *   }
+ * }
+ * </pre>
+ *
  * @author Christian Bremer
  */
-public interface OAuth2ForeignTokenRepository extends MongoRepository<OAuth2ForeignToken, String> {
-
-  long countByUserNameAndProvider(String userName, String provider);
-
-  Optional<OAuth2ForeignToken> findByProviderAndForeignUserName(String provider, String foreignUserName);
-
-  Optional<OAuth2ForeignToken> findByProviderAndUserName(String provider, String userName);
-
-  void deleteByProviderAndUserName(String provider, String userName);
-
-}
+package org.bremersee.authman.domain.changelogs;

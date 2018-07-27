@@ -23,6 +23,8 @@ import javax.validation.constraints.NotNull;
  */
 public interface ForeignUserProfileParser {
 
+  String getProvider();
+
   ForeignUserProfile parseForeignUserProfile(@NotNull byte[] profileBytes);
 
 }

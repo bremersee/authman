@@ -16,13 +16,23 @@
 
 package org.bremersee.authman.security.authentication.github;
 
+import lombok.RequiredArgsConstructor;
 import org.bremersee.authman.security.authentication.ForeignUserProfile;
 import org.bremersee.authman.security.authentication.ForeignUserProfileParser;
+import org.bremersee.authman.security.authentication.OAuth2AuthenticationProperties;
 
 /**
  * @author Christian Bremer
  */
+@RequiredArgsConstructor
 public class GitHubUserProfileParser implements ForeignUserProfileParser {
+
+  private final OAuth2AuthenticationProperties properties;
+
+  @Override
+  public String getProvider() {
+    return properties.getProvider();
+  }
 
   @Override
   public ForeignUserProfile parseForeignUserProfile(byte[] profileBytes) {

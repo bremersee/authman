@@ -25,7 +25,6 @@ import lombok.NoArgsConstructor;
  * @author Christian Bremer
  */
 @Data
-@NoArgsConstructor
 public class RedirectMessage implements Serializable {
 
   private static final long serialVersionUID = 6782221503683539133L;
@@ -35,6 +34,9 @@ public class RedirectMessage implements Serializable {
   private RedirectMessageType msgType = RedirectMessageType.INFO;
 
   private String msg;
+
+  public RedirectMessage() {
+  }
 
   public RedirectMessage(@NotNull String msg) {
     this.msg = msg;

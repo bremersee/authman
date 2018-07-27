@@ -16,12 +16,22 @@
 
 package org.bremersee.authman.security.authentication.google;
 
+import lombok.RequiredArgsConstructor;
 import org.bremersee.authman.security.authentication.ForeignUserProfileParser;
+import org.bremersee.authman.security.authentication.OAuth2AuthenticationProperties;
 
 /**
  * @author Christian Bremer
  */
+@RequiredArgsConstructor
 public class GoogleUserProfileParser implements ForeignUserProfileParser {
+
+  private final OAuth2AuthenticationProperties properties;
+
+  @Override
+  public String getProvider() {
+    return properties.getProvider();
+  }
 
   @Override
   public GoogleUserProfile parseForeignUserProfile(byte[] profileBytes) {

@@ -14,22 +14,13 @@
  * limitations under the License.
  */
 
-package org.bremersee.authman.domain;
-
-import java.util.Optional;
-import org.springframework.data.mongodb.repository.MongoRepository;
+package org.bremersee.authman.domain.changelogs;
 
 /**
+ * This interface is only used to get it's package name in {@link org.bremersee.authman.MongobeeConfiguration}.
+ *
  * @author Christian Bremer
  */
-public interface OAuth2ForeignTokenRepository extends MongoRepository<OAuth2ForeignToken, String> {
-
-  long countByUserNameAndProvider(String userName, String provider);
-
-  Optional<OAuth2ForeignToken> findByProviderAndForeignUserName(String provider, String foreignUserName);
-
-  Optional<OAuth2ForeignToken> findByProviderAndUserName(String provider, String userName);
-
-  void deleteByProviderAndUserName(String provider, String userName);
+public interface Placeholder {
 
 }

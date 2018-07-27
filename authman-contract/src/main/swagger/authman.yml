@@ -1,0 +1,451 @@
+swagger: "2.0"
+info:
+  description: "User profile listener contract."
+  version: "1.0.0"
+  title: "User Profile Listener"
+  contact:
+    name: "Christian Bremer"
+    email: "bremersee@googlemail.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "bremersee.org"
+basePath: "/"
+tags:
+- name: "user-profile-listener"
+  description: "Listener endpoint of user profile changes."
+schemes:
+- "http"
+- "https"
+paths:
+  /api/event/user-registration:
+    post:
+      tags:
+      - "user-profile-listener"
+      summary: "A user profile registration request was saved."
+      description: ""
+      operationId: "onUserRegistrationRequest"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "userRegistrationRequest"
+        description: "The registration request of the user with it's expiration date."
+        required: true
+        schema:
+          $ref: "#/definitions/UserProfileRegistrationRequestEventDto"
+      responses:
+        400:
+          description: "Invalid request"
+      security:
+      - bremersee_auth:
+        - "profile:sync"
+  /api/event/user-profile:
+    post:
+      tags:
+      - "user-profile-listener"
+      summary: "A user profile was saved."
+      description: ""
+      operationId: "onCreateUserProfile"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "createRequest"
+        description: "The created user profile and it's password if it is available."
+        required: true
+        schema:
+          $ref: "#/definitions/UserProfileCreationEventDto"
+      responses:
+        400:
+          description: "Invalid request"
+      security:
+      - bremersee_auth:
+        - "profile:sync"
+    put:
+      tags:
+      - "user-profile-listener"
+      summary: "Updates an existing user profile on an external system."
+      description: ""
+      operationId: "onChangeUserProfile"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "newUserProfile"
+        description: "The new user profile."
+        required: true
+        schema:
+          $ref: "#/definitions/UserProfileChangeEventDto"
+      responses:
+        400:
+          description: "Invalid request"
+        404:
+          description: "User not found"
+        405:
+          description: "Validation exception"
+      security:
+      - bremersee_auth:
+        - "profile:sync"
+  /api/event/user-profile/{userName}:
+    delete:
+      tags:
+      - "user-profile-listener"
+      summary: "Deletes an user profile on an external system."
+      description: ""
+      operationId: "onDeleteUserProfile"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userName"
+        in: "path"
+        description: "User name to delete."
+        required: true
+        type: "string"
+      responses:
+        400:
+          description: "Invalid request"
+        404:
+          description: "User not found"
+      security:
+      - bremersee_auth:
+        - "profile:sync"
+  /api/event/user-profile/{userName}/enabled:
+    put:
+      tags:
+      - "user-profile-listener"
+      summary: "Updates the enabled state of an user profile on an external system."
+      description: ""
+      operationId: "onChangeEnabledState"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userName"
+        in: "path"
+        description: "User name to change the enabled state."
+        required: true
+        type: "string"
+      - name: "newEnabledState"
+        in: "body"
+        description: "The new enabled state of the user profile."
+        required: true
+        schema:
+          $ref: "#/definitions/EnabledDto"
+      responses:
+        400:
+          description: "Invalid request"
+        404:
+          description: "User not found"
+      security:
+      - bremersee_auth:
+        - "profile:sync"
+  /api/event/user-profile/{userName}/password:
+    put:
+      tags:
+      - "user-profile-listener"
+      summary: "Updates the password of an user profile on an external system."
+      description: ""
+      operationId: "onNewPassword"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userName"
+        in: "path"
+        description: "User name to change the password."
+        required: true
+        type: "string"
+      - name: "newPassword"
+        in: "body"
+        description: "The new password of the user profile."
+        required: true
+        schema:
+          $ref: "#/definitions/NewPasswordDto"
+      responses:
+        400:
+          description: "Invalid request"
+        404:
+          description: "User not found"
+      security:
+      - bremersee_auth:
+        - "profile:sync"
+  /api/event/user-profile/{userName}/email:
+    put:
+      tags:
+      - "user-profile-listener"
+      summary: "Updates the email address of an user profile on an external system."
+      description: ""
+      operationId: "onNewEmail"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userName"
+        in: "path"
+        description: "User name to change the email address."
+        required: true
+        type: "string"
+      - name: "newEmail"
+        in: "body"
+        description: "The new email address of the user profile."
+        required: true
+        schema:
+          $ref: "#/definitions/NewEmailDto"
+      responses:
+        400:
+          description: "Invalid request"
+        404:
+          description: "User not found"
+      security:
+      - bremersee_auth:
+        - "profile:sync"
+  /api/event/user-profile/{userName}/mobile:
+    put:
+      tags:
+      - "user-profile-listener"
+      summary: "Updates the mobile number of an user profile on an external system."
+      description: ""
+      operationId: "onNewMobile"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userName"
+        in: "path"
+        description: "User name to change the mobile number."
+        required: true
+        type: "string"
+      - name: "newMobile"
+        in: "body"
+        description: "The new mobile number of the user profile."
+        required: true
+        schema:
+          $ref: "#/definitions/NewMobileDto"
+      responses:
+        400:
+          description: "Invalid request"
+        404:
+          description: "User not found"
+      security:
+      - bremersee_auth:
+        - "profile:sync"
+    delete:
+      tags:
+      - "user-profile-listener"
+      summary: "Deletes the mobile number of an user profile on an external system."
+      description: ""
+      operationId: "onDeleteMobile"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userName"
+        in: "path"
+        description: "User name to delete the mobile number."
+        required: true
+        type: "string"
+      - name: "number"
+        in: "query"
+        description: "The mobile number to be deleted."
+        required: false
+        type: "string"
+      responses:
+        400:
+          description: "Invalid request"
+        404:
+          description: "User not found"
+      security:
+      - bremersee_auth:
+        - "profile:sync"
+  /api/event/user-profile/{userName}/roles:
+    put:
+      tags:
+      - "user-profile-listener"
+      summary: "Updates the roles of an user on an external system."
+      description: ""
+      operationId: "onNewRoles"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "userName"
+        in: "path"
+        description: "User name to change the roles."
+        required: true
+        type: "string"
+      - name: "newRoles"
+        in: "body"
+        description: "The new roles of the user."
+        required: true
+        schema:
+          $ref: "#/definitions/NewRolesDto"
+      responses:
+        400:
+          description: "Invalid request"
+        404:
+          description: "User not found"
+      security:
+      - bremersee_auth:
+        - "profile:sync"
+securityDefinitions:
+  bremersee_auth:
+    type: "oauth2"
+    authorizationUrl: "http://localhost:8080/authman/authorize"
+    flow: "implicit"
+    scopes:
+      profile: "Read your profile."
+      profile:sync: "Write your profile."
+definitions:
+  UserProfileRegistrationRequestEventDto:
+    type: "object"
+    properties:
+      userName:
+        type: "string"
+      password:
+        type: "string"
+        format: "password"
+      displayName:
+        type: "string"
+      preferredLocale:
+        type: "string"
+      preferredTimeZoneId:
+        type: "string"
+      email:
+        type: "string"
+        format: "email"
+      expirationDate:
+        type: "string"
+        format: "date-time"
+  UserProfileCreationEventDto:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      version:
+        type: "integer"
+        format: "int64"
+      created:
+        type: "string"
+        format: "date-time"
+      createdBy:
+        type: "string"
+      modified:
+        type: "string"
+        format: "date-time"
+      modifiedBy:
+        type: "string"
+      userName:
+        type: "string"
+      password:
+        type: "string"
+        format: "password"
+      displayName:
+        type: "string"
+      preferredLocale:
+        type: "string"
+      preferredTimeZoneId:
+        type: "string"
+      email:
+        type: "string"
+        format: "email"
+      mobile:
+        type: "string"
+      roles:
+        type: "array"
+        items:
+          type: "string"
+        description: "The roles of the user."
+      groups:
+        type: "array"
+        items:
+          type: "string"
+        description: "The groups of the user."
+  UserProfileChangeEventDto:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      version:
+        type: "integer"
+        format: "int64"
+      created:
+        type: "string"
+        format: "date-time"
+      createdBy:
+        type: "string"
+      modified:
+        type: "string"
+        format: "date-time"
+      modifiedBy:
+        type: "string"
+      userName:
+        type: "string"
+      displayName:
+        type: "string"
+      preferredLocale:
+        type: "string"
+      preferredTimeZoneId:
+        type: "string"
+      email:
+        type: "string"
+        format: "email"
+      mobile:
+        type: "string"
+      groups:
+        type: "array"
+        items:
+          type: "string"
+        description: "The groups of the user."
+  EnabledDto:
+    type: "object"
+    properties:
+      value:
+        type: "boolean"
+        description: "Is the user enabled?"
+    required:
+      - "value"
+  NewPasswordDto:
+    type: "object"
+    properties:
+      value:
+        type: "string"
+        format: "password"
+        description: "The clear new password."
+    required:
+      - "value"
+  NewEmailDto:
+    type: "object"
+    properties:
+      value:
+        type: "string"
+        format: "email"
+        description: "The new email address."
+    required:
+      - "value"
+  NewMobileDto:
+    type: "object"
+    properties:
+      value:
+        type: "string"
+        description: "The new mobile number."
+    required:
+      - "value"
+  NewRolesDto:
+    type: "object"
+    properties:
+      roles:
+        type: "array"
+        items:
+          type: "string"
+        description: "The new roles of the user."

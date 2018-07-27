@@ -18,19 +18,28 @@ package org.bremersee.authman.security.authentication.facebook;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bremersee.authman.security.authentication.ForeignUserProfile;
 import org.bremersee.authman.security.authentication.ForeignUserProfileParser;
 import org.bremersee.authman.security.authentication.OAuth2AuthenticationException;
+import org.bremersee.authman.security.authentication.OAuth2AuthenticationProperties;
 
 /**
  * @author Christian Bremer
  */
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class FacebookUserProfileParser implements ForeignUserProfileParser {
 
-  private ObjectMapper objectMapper = new ObjectMapper();
+  private final OAuth2AuthenticationProperties properties;
+
+  private final ObjectMapper objectMapper;
+
+  @Override
+  public String getProvider() {
+    return properties.getProvider();
+  }
 
   @Override
   public ForeignUserProfile parseForeignUserProfile(byte[] profileBytes) {

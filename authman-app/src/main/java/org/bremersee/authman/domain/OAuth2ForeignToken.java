@@ -42,6 +42,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @CompoundIndexes({
     @CompoundIndex(name = "oauth2_token_uk_provider_foreign_user",
         def = "{'provider': 1, 'foreignUserName': 1 }",
+        unique = true),
+    @CompoundIndex(name = "oauth2_token_uk_provider_user",
+        def = "{'provider': 1, 'userName': 1 }",
         unique = true)
 })
 public class OAuth2ForeignToken extends AbstractAuditBase {

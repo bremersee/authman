@@ -62,7 +62,8 @@ bremersee:
         &state={state}"
       client-id: ${FACEBOOK_CLIENT_ID:changeit}
       client-secret: ${FACEBOOK_CLIENT_SECRET:changeit}
-      redirect-uri: http://localhost:${server.port}${server.servlet.context-path}/facebook/callback
+      redirect-uri: http://localhost:8080/facebook/callback
+      redirect-uri-profile-connect: http://localhost:8080/profile/facebook/callback
       response-type: code
       scope: public_profile,email
       token-url-template: "\
@@ -84,7 +85,9 @@ bremersee:
         &state={state}"
       client-id: ${GITHUB_CLIENT_ID:changeit}
       client-secret: ${GITHUB_CLIENT_SECRET:changeit}
-      redirect-uri: http://localhost:${server.port}${server.servlet.context-path}/github/callback
+      #redirect-uri: http://localhost:${server.port}${server.servlet.context-path}/github/callback
+      redirect-uri: http://localhost:8080/github/callback
+      redirect-uri-profile-connect: http://localhost:8080/github/callback/profile
       response-type: code
       scope: user
       token-url-template: "\
@@ -110,6 +113,7 @@ bremersee:
       client-id: ${GOOGLE_CLIENT_ID:changeit}
       client-secret: ${GOOGLE_CLIENT_SECRET:changeit}
       redirect-uri: http://localhost:${server.port}${server.servlet.context-path}/google/callback
+      redirect-uri-profile-connect: http://localhost:8080/profile/google/callback
       response-type: code
       scope: profile email
       additional-login-parameters:
@@ -208,8 +212,11 @@ server:
 spring:
   data:
     mongodb:
-      database: auth
       host: localhost
+#      port: 27017
+#      username: changeit
+#      password: chnageit
+      database: auth
   jackson:
     date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
     default-property-inclusion: non_null

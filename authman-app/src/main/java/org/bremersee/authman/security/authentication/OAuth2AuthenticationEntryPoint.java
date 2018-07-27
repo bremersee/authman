@@ -17,9 +17,6 @@
 package org.bremersee.authman.security.authentication;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -72,46 +69,13 @@ public class OAuth2AuthenticationEntryPoint implements AuthenticationEntryPoint 
     final String state = UUID.randomUUID().toString().replace("-", "");
     final String url = buildLoginUrl(state);
     getStateCache().saveState(request, state);
-
     getRedirectStrategy().sendRedirect(request, response, url);
   }
 
   @SuppressWarnings("WeakerAccess")
   protected String buildLoginUrl(final String state) throws IOException {
-    String url = properties.getLoginUrlTemplate();
-    url = url.replace("{clientId}",
-        URLEncoder.encode(properties.getClientId(), StandardCharsets.UTF_8.name()));
-    url = url.replace("{redirectUri}",
-        URLEncoder.encode(properties.getRedirectUri(), StandardCharsets.UTF_8.name()));
-    url = url.replace("{responseType}",
-        URLEncoder.encode(properties.getResponseType(), StandardCharsets.UTF_8.name()));
-    url = url.replace("{scope}",
-        URLEncoder.encode(properties.getScope(), StandardCharsets.UTF_8.name()));
-    url = url.replace("{state}", URLEncoder.encode(state, StandardCharsets.UTF_8.name()));
-    return replaceAllAdditionalParameters(url);
-  }
-
-  @SuppressWarnings("WeakerAccess")
-  protected String replaceAllAdditionalParameters(final String url) throws IOException {
-    String tmp = url;
-    String newUrl;
-    while (!(newUrl = replaceAdditionalParameters(tmp)).equals(tmp)) {
-      tmp = newUrl;
-    }
-    return newUrl;
-  }
-
-  private String replaceAdditionalParameters(final String url) throws IOException {
-    final Map<String, String> params = properties.getAdditionalLoginParameters();
-    final int start = url.indexOf('{');
-    final int end = url.indexOf('}');
-    if (0 < start && start < end) {
-      final String key = url.substring(start + 1, end);
-      final String value = params.getOrDefault(key, "");
-      return url.substring(0, start) + URLEncoder.encode(value, StandardCharsets.UTF_8.name())
-          + url.substring(end + 1);
-    }
-    return url;
+    return properties.buildLoginUrl(
+        null, null, null, state, null);
   }
 
 }

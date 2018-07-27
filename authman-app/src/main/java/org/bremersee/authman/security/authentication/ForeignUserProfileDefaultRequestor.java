@@ -38,12 +38,16 @@ public class ForeignUserProfileDefaultRequestor implements ForeignUserProfileReq
 
   private RestTemplateBuilder restTemplateBuilder = new RestTemplateBuilder();
 
-  @SuppressWarnings("SpringJavaAutowiredMembersInspection")
-  @Autowired(required = false)
-  public void setRestTemplateBuilder(RestTemplateBuilder restTemplateBuilder) {
+  public void setRestTemplateBuilder(final RestTemplateBuilder restTemplateBuilder) {
     if (restTemplateBuilder != null) {
       this.restTemplateBuilder = restTemplateBuilder;
     }
+  }
+
+  public ForeignUserProfileDefaultRequestor restTemplateBuilder(
+      final RestTemplateBuilder restTemplateBuilder) {
+    setRestTemplateBuilder(restTemplateBuilder);
+    return this;
   }
 
   @Override

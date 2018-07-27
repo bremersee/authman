@@ -31,18 +31,18 @@ import org.apache.commons.lang3.Validate;
  */
 @Slf4j
 @RequiredArgsConstructor
-class OAuth2StateCache {
+public class OAuth2StateCache {
 
   @NonNull
   private final String keyName;
 
-  void saveState(final HttpServletRequest request, final String state) {
+  public void saveState(final HttpServletRequest request, final String state) {
     Validate.notNull(request, "Http request must not be null.");
     request.getSession(true).setAttribute(keyName, state);
     log.debug("State saved in session with ID {}", request.getSession(true).getId());
   }
 
-  String getState(final HttpServletRequest request) {
+  public String getState(final HttpServletRequest request) {
     Validate.notNull(request, "Http request must not be null.");
     String state = (String) request.getSession(true).getAttribute(keyName);
     if (StringUtils.isBlank(state)) {
@@ -51,7 +51,7 @@ class OAuth2StateCache {
     return state;
   }
 
-  void removeState(final HttpServletRequest request) {
+  public void removeState(final HttpServletRequest request) {
     if (request != null && request.getSession() != null) {
       request.getSession(true).removeAttribute(keyName);
     }

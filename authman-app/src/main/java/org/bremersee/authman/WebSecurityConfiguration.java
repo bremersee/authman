@@ -17,7 +17,6 @@
 package org.bremersee.authman;
 
 import org.bremersee.authman.security.authentication.ForeignUserProfileDefaultRequestor;
-import org.bremersee.authman.security.authentication.ForeignUserProfileParser;
 import org.bremersee.authman.security.authentication.ForeignUserProfileRequestor;
 import org.bremersee.authman.security.authentication.OAuth2AuthenticationEntryPoint;
 import org.bremersee.authman.security.authentication.OAuth2CallbackFilter;
@@ -35,6 +34,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -64,17 +64,21 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   private GoogleAuthenticationProperties googleAuthenticationProperties;
 
+  private Jackson2ObjectMapperBuilder objectMapperBuilder;
+
   private RestTemplateBuilder restTemplateBuilder;
 
   public WebSecurityConfiguration(
       final FacebookAuthenticationProperties facebookAuthenticationProperties,
       final GitHubAuthenticationProperties gitHubAuthenticationProperties,
       final GoogleAuthenticationProperties googleAuthenticationProperties,
+      final Jackson2ObjectMapperBuilder objectMapperBuilder,
       final RestTemplateBuilder restTemplateBuilder) {
 
     this.facebookAuthenticationProperties = facebookAuthenticationProperties;
     this.gitHubAuthenticationProperties = gitHubAuthenticationProperties;
     this.googleAuthenticationProperties = googleAuthenticationProperties;
+    this.objectMapperBuilder = objectMapperBuilder;
     this.restTemplateBuilder = restTemplateBuilder;
   }
 
@@ -111,14 +115,23 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         new AntPathRequestMatcher("/google/login", "POST"));
   }
 
+  @Bean("facebookUserProfileParser")
+  public FacebookUserProfileParser facebookUserProfileParser() {
+    return new FacebookUserProfileParser(
+        facebookAuthenticationProperties, objectMapperBuilder.build());
+  }
+
   @Bean("facebookCallbackFilter")
-  public OAuth2CallbackFilter facebookCallbackFilter() throws Exception {
+  public OAuth2CallbackFilter facebookCallbackFilter()
+      throws Exception {
 
     final AntPathRequestMatcher requestMatcher = new AntPathRequestMatcher(
         "/facebook/callback", "GET");
-    final ForeignUserProfileParser userParser = new FacebookUserProfileParser();
     final ForeignUserProfileRequestor userRequestor = new ForeignUserProfileDefaultRequestor(
-        facebookAuthenticationProperties, userParser);
+        facebookAuthenticationProperties,
+        new FacebookUserProfileParser(
+            facebookAuthenticationProperties, objectMapperBuilder.build()))
+        .restTemplateBuilder(restTemplateBuilder);
     final OAuth2CallbackFilter callbackFilter = new OAuth2CallbackFilter(
         facebookAuthenticationProperties, userRequestor, requestMatcher);
     callbackFilter.setAuthenticationManager(authenticationManagerBean());
@@ -126,14 +139,20 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     return callbackFilter;
   }
 
+  @Bean("gitHubUserProfileParser")
+  public GitHubUserProfileParser gitHubUserProfileParser() {
+    return new GitHubUserProfileParser(gitHubAuthenticationProperties);
+  }
+
   @Bean("gitHubCallbackFilter")
   public OAuth2CallbackFilter gitHubCallbackFilter() throws Exception {
 
     final AntPathRequestMatcher requestMatcher = new AntPathRequestMatcher(
         "/github/callback", "GET");
-    final ForeignUserProfileParser userParser = new GitHubUserProfileParser();
     final ForeignUserProfileRequestor userRequestor = new ForeignUserProfileDefaultRequestor(
-        gitHubAuthenticationProperties, userParser);
+        gitHubAuthenticationProperties,
+        new GitHubUserProfileParser(gitHubAuthenticationProperties))
+        .restTemplateBuilder(restTemplateBuilder);
     final OAuth2CallbackFilter callbackFilter = new OAuth2CallbackFilter(
         gitHubAuthenticationProperties, userRequestor, requestMatcher);
     callbackFilter.setAuthenticationManager(authenticationManagerBean());
@@ -141,14 +160,20 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     return callbackFilter;
   }
 
+  @Bean("googleUserProfileParser")
+  public GoogleUserProfileParser googleUserProfileParser() {
+    return new GoogleUserProfileParser(googleAuthenticationProperties);
+  }
+
   @Bean("googleCallbackFilter")
   public OAuth2CallbackFilter googleCallbackFilter() throws Exception {
 
     final AntPathRequestMatcher requestMatcher = new AntPathRequestMatcher(
         "/google/callback", "GET");
-    final ForeignUserProfileParser userParser = new GoogleUserProfileParser();
     final ForeignUserProfileRequestor userRequestor = new ForeignUserProfileDefaultRequestor(
-        googleAuthenticationProperties, userParser);
+        googleAuthenticationProperties,
+        new GoogleUserProfileParser(googleAuthenticationProperties))
+        .restTemplateBuilder(restTemplateBuilder);
     final OAuth2CallbackFilter callbackFilter = new OAuth2CallbackFilter(
         googleAuthenticationProperties, userRequestor, requestMatcher);
     callbackFilter.setAuthenticationManager(authenticationManagerBean());

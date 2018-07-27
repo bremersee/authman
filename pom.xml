@@ -153,6 +153,7 @@
 
   <modules>
     <module>authman-common</module>
+    <module>authman-contract</module>
     <module>authman-listener-contract</module>
     <module>authman-samba-contract</module>
     <module>authman-app</module>

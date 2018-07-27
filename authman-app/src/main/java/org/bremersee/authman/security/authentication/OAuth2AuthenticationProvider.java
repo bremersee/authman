@@ -16,7 +16,6 @@
 
 package org.bremersee.authman.security.authentication;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Random;
@@ -33,6 +32,8 @@ import org.bremersee.authman.domain.RoleRepository;
 import org.bremersee.authman.domain.UserProfile;
 import org.bremersee.authman.domain.UserProfileRepository;
 import org.bremersee.authman.domain.UserRegistrationRequestRepository;
+import org.bremersee.authman.mapper.OAuth2ForeignTokenMapper;
+import org.bremersee.authman.mapper.OAuth2ForeignTokenMapperImpl;
 import org.bremersee.authman.security.core.RoleConstants;
 import org.bremersee.authman.security.crypto.password.PasswordEncoder;
 import org.bremersee.utils.PasswordUtils;
@@ -72,6 +73,16 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider {
 
   @NonNull
   private final PasswordEncoder passwordEncoder;
+
+  private OAuth2ForeignTokenMapper foreignTokenMapper = new OAuth2ForeignTokenMapperImpl();
+
+  @SuppressWarnings("unused")
+  public void setForeignTokenMapper(
+      final OAuth2ForeignTokenMapper foreignTokenMapper) {
+    if (foreignTokenMapper != null) {
+      this.foreignTokenMapper = foreignTokenMapper;
+    }
+  }
 
   @Override
   public Authentication authenticate(@NotNull final Authentication authentication) {
@@ -121,7 +132,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider {
     OAuth2ForeignToken foreignToken = findForeignToken(authentication)
         .orElse(new OAuth2ForeignToken());
 
-    mapAuthenticationToForeignToken(authentication, foreignToken);
+    foreignTokenMapper.updateForeignToken(foreignToken, authentication);
 
     if (StringUtils.hasText(foreignToken.getUserName())) {
       foreignToken = saveForeignToken(foreignToken);
@@ -178,7 +189,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider {
     if (passwordEncoder.matches(authentication.getPassword(), user.getPassword())) {
       final OAuth2ForeignToken foreignToken = findForeignToken(authentication)
           .orElse(new OAuth2ForeignToken());
-      mapAuthenticationToForeignToken(authentication, foreignToken);
+      foreignTokenMapper.updateForeignToken(foreignToken, authentication);
       foreignToken.setUserName(user.getUsername());
       saveForeignToken(foreignToken);
 
@@ -209,7 +220,7 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider {
     final UserProfile userProfile = createAndSaveNewUserProfile(authentication);
     final OAuth2ForeignToken foreignToken = findForeignToken(authentication)
         .orElse(new OAuth2ForeignToken());
-    mapAuthenticationToForeignToken(authentication, foreignToken);
+    foreignTokenMapper.updateForeignToken(foreignToken, authentication);
     foreignToken.setUserName(authentication.getUserName());
     saveForeignToken(foreignToken);
 
@@ -251,33 +262,6 @@ public class OAuth2AuthenticationProvider implements AuthenticationProvider {
 
   private OAuth2ForeignToken saveForeignToken(@NotNull final OAuth2ForeignToken foreignToken) {
     return oauth2TokenRepository.save(foreignToken);
-  }
-
-  private void mapAuthenticationToForeignToken(
-      @NotNull final OAuth2AuthenticationToken source,
-      @NotNull final OAuth2ForeignToken destination) {
-
-    log.debug("Mapping authentication token to foreign token ...");
-    destination.setProvider(source.getProvider());
-    destination.setForeignUserName(source.getPrincipal().getName());
-    destination.setScopes(source.getGrantedScopes());
-    destination.setAccessToken(source.getCredentials().getAccessToken());
-    destination.setTokenType(source.getCredentials().getTokenType());
-    destination.setRefreshToken(source.getCredentials().getRefreshToken());
-    final String expiresSecondsStr = source.getCredentials().getExpiresIn();
-    if (StringUtils.hasText(expiresSecondsStr)) {
-      try {
-        final Long expiresSeconds = Long.parseLong(expiresSecondsStr);
-        destination.setExpiresAt(new Date(System.currentTimeMillis() + expiresSeconds));
-
-      } catch (final NumberFormatException nfe) {
-        destination.setExpiresAt(null);
-        if (log.isWarnEnabled()) {
-          log.warn(String.format("Parsing expires in [%s] failes.", expiresSecondsStr), nfe);
-        }
-      }
-    }
-    log.debug("Mapping authentication token to foreign token: {}", destination);
   }
 
   private void validateLinkAuthenticationToken(final OAuth2LinkAuthenticationToken authentication) {

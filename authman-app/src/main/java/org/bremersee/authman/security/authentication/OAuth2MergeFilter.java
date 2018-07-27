@@ -16,10 +16,8 @@
 
 package org.bremersee.authman.security.authentication;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -63,8 +61,7 @@ public class OAuth2MergeFilter extends AbstractAuthenticationProcessingFilter {
   @Override
   public Authentication attemptAuthentication(
       final HttpServletRequest request,
-      final HttpServletResponse response)
-      throws IOException, ServletException {
+      final HttpServletResponse response) {
 
     log.debug("Merging OAuth2 authentication with local account ...");
 

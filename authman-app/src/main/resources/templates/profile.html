@@ -50,7 +50,7 @@
     </div>
 
     <div>
-      <form th:action="@{'profile'}" th:object="${profile}" action="#" method="post">
+      <form th:action="@{profile}" th:object="${profile}" action="#" method="post">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
 
         <div class="form-group">
@@ -159,6 +159,7 @@
               <input id="github" type="checkbox" class="form-check-input"
                      disabled th:checked="${gitHubConnected}" />
               <label for="github"><i class="fa fa-github left"></i> GitHub</label>
+              <a href="#" th:href="@{profile/oauth2-connect(provider=github)}">Connect account</a>
             </div>
             <div class="form-check">
               <input id="google" type="checkbox" class="form-check-input"
